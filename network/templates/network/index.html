@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hálózati Eszköz Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        #container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            border: 1px solid #ccc;
+        }
+        #interface-list {
+            width: 30%;
+            border-right: 1px solid #ccc;
+            padding: 10px;
+        }
+        #settings {
+            width: 70%;
+            padding: 10px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        #ip-input {
+            margin-bottom: 20px;
+        }
+        button {
+            margin-left: 10px;
+        }
+        .interface-item {
+            cursor: pointer;
+            padding: 5px;
+            border: 1px solid transparent;
+        }
+        .interface-item:hover {
+            background-color: #f0f0f0;
+        }
+        .setting {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Hálózati Eszköz Manager</h1>
+    <div>
+        <input type="text" id="ip-input" name="ip-input" placeholder="Enter Device IP Address" />
+        <button id="connect-button" onclick="window.location.href = '/connect/' + document.getElementById('ip-input').value">Kapcsolódás</button>
+    </div>
+
+    <div id="container">
+        <div id="interface-list">
+            <h2>Interfaces</h2>
+            <ul id="interface-items">
+                <!-- Interface items will be dynamically added here -->
+            </ul>
+        </div>
+        <div id="settings">
+            <h2>Settings</h2>
+            <div id="interface-settings">
+                <!-- Settings for the selected interface will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const connectButton = document.getElementById('connect-button');
+        const ipInput = document.getElementById('ip-input');
+        const interfaceItems = document.getElementById('interface-items');
+        const interfaceSettings = document.getElementById('interface-settings');
+
+        connectButton.addEventListener('click', function() {
+            const ipAddress = ipInput.value;
+            // Here you would typically make an AJAX call to your backend to connect to the device
+            // For demonstration, let's assume we get some interfaces back
+            const interfaces = ['GigabitEthernet0/0', 'GigabitEthernet0/1', 'FastEthernet0/0'];
+
+            // Clear previous interface items
+            interfaceItems.innerHTML = '';
+
+            // Populate the interface list
+            interfaces.forEach(interface => {
+                const li = document.createElement('li');
+                li.textContent = interface;
+                li.className = 'interface-item';
+                li.onclick = () => showSettings(interface);
+                interfaceItems.appendChild(li);
+            });
+        });
+
+        function showSettings(interface) {
+            // Here you would typically fetch the settings for the selected interface
+            // For demonstration, let's use some mock settings
+            const settings = `
+                <div class="setting"><strong>Interface:</strong> ${interface}</div>
+                <div class="setting"><strong>Status:</strong> <button onclick="toggleStatus('${interface}')">Toggle On/Off</button></div>
+                <div class="setting"><strong>IP Address:</strong> <input type="text" placeholder="Enter IP Address" /></div>
+            `;
+            interfaceSettings.innerHTML = settings;
+        }
+
+        function toggleStatus(interface) {
+            // Logic to toggle the status of the interface
+            alert(`Toggling status for ${interface}`);
+        }
+    </script>
+
+</body>
+</html>
