@@ -65,11 +65,10 @@
 <body>
 
     <h1>Hálózati Eszköz Manager</h1>
+    <button onclick="send_command('conf t')">Send</button>
     <div>
-        <form id="connect-form">
-            <input type="text" id="ip-input" name="ip-input" placeholder="Enter Device IP Address" />
-            <button type="submit" id="connect-button">Kapcsolódás</button>
-        </form>
+        <input type="text" id="ip-input" name="ip-input" placeholder="Enter Device IP Address" />
+        <button type="submit" id="connect-button">Kapcsolódás</button>
     </div>
 
     <div id="alert-box" style="display: none;">
@@ -101,26 +100,42 @@
             const ipAddress = ipInput.value;
             // Here you would typically make an AJAX call to your backend to connect to the device
             // For demonstration, let's assume we get some interfaces back
-            const interfaces = 
-                ['FastEthernet0/0', 'FastEthernet0/1', 'FastEthernet0/2', 'FastEthernet0/3', 'FastEthernet0/4', 
-                'FastEthernet0/5', 'FastEthernet0/6', 'FastEthernet0/7', 'FastEthernet0/8', 'FastEthernet0/9', 
-                'FastEthernet0/10', 'FastEthernet0/11', 'FastEthernet0/12', 'FastEthernet0/13', 'FastEthernet0/14',
-                'FastEthernet0/15', 'FastEthernet0/16', 'FastEthernet0/17', 'FastEthernet0/18', 'FastEthernet0/19',
-                'FastEthernet0/20', 'FastEthernet0/21', 'FastEthernet0/22', 'FastEthernet0/23', 'FastEthernet0/24',
-                'GigabitEthernet0/0', 'GigabitEthernet0/1'];
+            interfaces = [];
 
-            // Clear previous interface items
-            interfaceItems.innerHTML = '';
+            fetch("/connect/" + document.getElementById('ip-input').value)
+            .then((response) => response.json())
+            .then((json) => {
+                interfaces = Object.keys(json)
+                console.log(interfaces)
+            }).then((_) => {
+                // Clear previous interface items
+                interfaceItems.innerHTML = '';
 
-            // Populate the interface list
-            interfaces.forEach(interface => {
-                const li = document.createElement('li');
-                li.textContent = interface;
-                li.className = 'interface-item';
-                li.onclick = () => showSettings(interface);
-                interfaceItems.appendChild(li);
-            });
+                // Populate the interface list
+                interfaces.forEach(interface => {
+                    const li = document.createElement('li');
+                    li.textContent = interface;
+                    li.className = 'interface-item';
+                    li.onclick = () => showSettings(interface);
+                    interfaceItems.appendChild(li);
+                });
+            })
         });
+
+        function send_command(command_message) {
+            let formData = new FormData()
+            formData.append("command", command_message)
+
+            fetch("/send_command/", {
+                method:"POST",
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                },
+                body: JSON.stringify({
+                    command: command_message
+                }),
+            })
+        }
 
         function showSettings(interface) {
             // Here you would typically fetch the settings for the selected interface
@@ -142,24 +157,7 @@
             document.getElementById("alert-text").innerHTML = message
             document.getElementById("alert-text").style.color = color
             document.getElementById("alert-box").style.display = "block"
-
         }
-
-        document.getElementById("connect-form").addEventListener('submit', (e) => {
-            fetch("/connect/" + document.getElementById('ip-input').value)
-            .then((response) => response.json())
-            .then((json) => {
-                json = JSON.parse(json)
-                console.log(json.type)
-                if (json.type == "error"){
-                    sendAlert(json[message], "red")
-                } else {
-                    sendAlert("Sikeres csatlakozás", "green")
-                }
-            })
-
-            e.preventDefault()
-        })
     </script>
 
 </body>
