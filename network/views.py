@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 import socket
 import threading
@@ -22,11 +22,9 @@ def connect(request, ip_address):
         receive_thread = threading.Thread(target=receive_messages)
         receive_thread.start()
     except Exception as e:
-        return HttpResponse("Error")
+        return JsonResponse('{"type":"error", "message":"Sikertelen csatlakozás"}', safe=False)
 
-    interfaces = get_switch_interfaces()
-    
-    return HttpResponse(interfaces)
+    return JsonResponse('{"type":"success", "message":"Sikeres csatlakozás"}', safe=False)
 
 def receive_messages():
     while True:
