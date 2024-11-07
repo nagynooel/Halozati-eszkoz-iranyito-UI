@@ -81,6 +81,10 @@
             <ul id="interface-items">
                 <!-- Interface items will be dynamically added here -->
             </ul>
+            <div id="general-settings-buttons" style="display: none;">
+                <button id="general-settings-button" onclick="showGeneralSettings()">General Settings</button>
+                <button id="vlan-database-button" onclick="showVlanDatabase()">VLAN Database</button>
+            </div>
         </div>
         <div id="settings">
             <h2>Settings</h2>
@@ -95,22 +99,20 @@
         const ipInput = document.getElementById('ip-input');
         const interfaceItems = document.getElementById('interface-items');
         const interfaceSettings = document.getElementById('interface-settings');
-
+        const generalSettingsButtons = document.getElementById('general-settings-buttons');
+    
         connectButton.addEventListener('click', function() {
             const ipAddress = ipInput.value;
-            // Here you would typically make an AJAX call to your backend to connect to the device
-            // For demonstration, let's assume we get some interfaces back
-            interfaces = [];
-
-            fetch("/connect/" + document.getElementById('ip-input').value)
+    
+            fetch("/connect/" + ipAddress)
             .then((response) => response.json())
             .then((json) => {
-                interfaces = Object.keys(json)
-                console.log(interfaces)
-            }).then((_) => {
+                const interfaces = Object.keys(json);
+                console.log(interfaces);
+    
                 // Clear previous interface items
                 interfaceItems.innerHTML = '';
-
+    
                 // Populate the interface list
                 interfaces.forEach(interface => {
                     const li = document.createElement('li');
@@ -119,27 +121,25 @@
                     li.onclick = () => showSettings(interface);
                     interfaceItems.appendChild(li);
                 });
-            })
+    
+                // Show general settings buttons when a device is connected
+                generalSettingsButtons.style.display = 'block';
+            });
         });
-
+    
         function send_command(command_message) {
-            let formData = new FormData()
-            formData.append("command", command_message)
-
             fetch("/send_command/", {
-                method:"POST",
+                method: "POST",
                 headers: {
                     "Content-type": "application/json; charset=UTF-8"
                 },
                 body: JSON.stringify({
                     command: command_message
                 }),
-            })
+            });
         }
-
+    
         function showSettings(interface) {
-            // Here you would typically fetch the settings for the selected interface
-            // For demonstration, let's use some mock settings
             const settings = `
                 <div class="setting"><strong>Interface:</strong> ${interface}</div>
                 <div class="setting"><strong>Status:</strong> <button onclick="toggleStatus('${interface}')">Toggle On/Off</button></div>
@@ -147,18 +147,63 @@
             `;
             interfaceSettings.innerHTML = settings;
         }
-
+    
         function toggleStatus(interface) {
-            // Logic to toggle the status of the interface
             alert(`Toggling status for ${interface}`);
         }
-
+    
+        function showGeneralSettings() {
+            const settings = `
+                <div class="setting"><strong>Hostname:</strong> 
+                    <input type="text" id="hostname-input" placeholder="Enter new hostname" />
+                    <button onclick="changeHostname()">Change Hostname</button>
+                </div>
+            `;
+            interfaceSettings.innerHTML = settings;
+        }
+    
+        function changeHostname() {
+            const hostnameInput = document.getElementById('hostname-input');
+            const newHostname = hostnameInput.value;
+    
+            // Logic to change the hostname
+            fetch("/change_hostname/", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                },
+                body: JSON.stringify({
+                    hostname: newHostname
+                }),
+            }).then(response => {
+                if (response.ok) {
+                    sendAlert("Hostname changed successfully!", "green");
+                } else {
+                    sendAlert("Failed to change hostname.", "red");
+                }
+            });
+        }
+    
+        function showVlanDatabase() {
+            // Logic to fetch and display VLAN database
+            fetch("/vlan_database/")
+            .then(response => response.json())
+            .then(data => {
+                // Process and display VLAN data
+                let vlanList = "<h3>VLAN Database</h3><ul>";
+                data.forEach(vlan => {
+                    vlanList += `<li>VLAN ID: ${vlan.id}, Name: ${vlan.name}</li>`;
+                });
+                vlanList += "</ul>";
+                interfaceSettings.innerHTML = vlanList;
+            });
+        }
+    
         function sendAlert(message, color) {
-            document.getElementById("alert-text").innerHTML = message
-            document.getElementById("alert-text").style.color = color
-            document.getElementById("alert-box").style.display = "block"
+            document.getElementById("alert-text").innerHTML = message;
+            document.getElementById("alert-text").style.color = color;
+            document.getElementById("alert-box").style.display = "block";
         }
     </script>
-
-</body>
+    </body>
 </html>
