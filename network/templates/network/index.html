@@ -4,68 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hálózati Eszköz Manager</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            padding: 20px;
-        }
-        #container {
-            display: flex;
-            width: 100%;
-            max-width: 1200px;
-            border: 1px solid #ccc;
-        }
-        #interface-list {
-            width: 30%;
-            border-right: 1px solid #ccc;
-            padding: 10px;
-        }
-        #settings {
-            width: 70%;
-            padding: 10px;
-        }
-        h1 {
-            margin-bottom: 20px;
-        }
-        #ip-input {
-            margin-bottom: 20px;
-        }
-        button {
-            margin-left: 10px;
-            background-color: white;
-            color: black;
-            border: 1px solid black;
-            padding: 4px 8px;
-            font-size: 10px;
-            font-family: Arial, sans-serif;
-            cursor: pointer;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-        button:hover {
-            background-color: #f0f0f0;
-            border-color: #888
-        }
-        .interface-item {
-            cursor: pointer;
-            padding: 5px;
-            border: 1px solid transparent;
-        }
-        .interface-item:hover {
-            background-color: #f0f0f0;
-        }
-        .setting {
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
 
     <h1>Hálózati Eszköz Manager</h1>
-    <button onclick="send_command('conf t')">Send</button>
     <div>
         <input type="text" id="ip-input" name="ip-input" placeholder="Enter Device IP Address" />
         <button type="submit" id="connect-button">Kapcsolódás</button>
@@ -75,16 +18,19 @@
         <h3 id="alert-text">Sikeres csatlakozás</h3>
     </div>
 
+    <button style="margin:10px" onclick="send_command('conf t')">Send</button>
+
     <div id="container">
         <div id="interface-list">
+            <h2>General settings</h2>
+            <ul id="general-settings" style="display: none;">
+                <div id="interface-item" onclick="showGeneralSettings()">General Settings</div>
+                <div id="interface-item" onclick="showVlanDatabase()">VLAN Database</div>
+            </ul>
             <h2>Interfaces</h2>
             <ul id="interface-items">
                 <!-- Interface items will be dynamically added here -->
             </ul>
-            <div id="general-settings-buttons" style="display: none;">
-                <button id="general-settings-button" onclick="showGeneralSettings()">General Settings</button>
-                <button id="vlan-database-button" onclick="showVlanDatabase()">VLAN Database</button>
-            </div>
         </div>
         <div id="settings">
             <h2>Settings</h2>
@@ -97,9 +43,9 @@
     <script>
         const connectButton = document.getElementById('connect-button');
         const ipInput = document.getElementById('ip-input');
+        const generalSettingsButtons = document.getElementById('general-settings');
         const interfaceItems = document.getElementById('interface-items');
         const interfaceSettings = document.getElementById('interface-settings');
-        const generalSettingsButtons = document.getElementById('general-settings-buttons');
     
         connectButton.addEventListener('click', function() {
             const ipAddress = ipInput.value;
@@ -112,6 +58,10 @@
     
                 // Clear previous interface items
                 interfaceItems.innerHTML = '';
+
+                    
+                // Show general settings buttons when a device is connected
+                generalSettingsButtons.style.display = 'block';
     
                 // Populate the interface list
                 interfaces.forEach(interface => {
@@ -121,9 +71,6 @@
                     li.onclick = () => showSettings(interface);
                     interfaceItems.appendChild(li);
                 });
-    
-                // Show general settings buttons when a device is connected
-                generalSettingsButtons.style.display = 'block';
             });
         });
     
