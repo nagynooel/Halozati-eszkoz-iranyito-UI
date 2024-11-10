@@ -58,8 +58,7 @@
     
                 // Clear previous interface items
                 interfaceItems.innerHTML = '';
-
-                    
+    
                 // Show general settings buttons when a device is connected
                 generalSettingsButtons.style.display = 'block';
     
@@ -91,8 +90,27 @@
                 <div class="setting"><strong>Interface:</strong> ${interface}</div>
                 <div class="setting"><strong>Status:</strong> <button onclick="toggleStatus('${interface}')">Toggle On/Off</button></div>
                 <div class="setting"><strong>IP Address:</strong> <input type="text" placeholder="Enter IP Address" /></div>
+                <div class="setting"><strong>Switchport Mode:</strong>
+                    <select id="switchport-mode" onchange="toggleVlanInput()">
+                        <option value="access">Access</option>
+                        <option value="trunk">Trunk</option>
+                    </select>
+                </div>
+                <div class="setting" id="vlan-setting" style="display: none;">
+                    <strong>VLAN ID:</strong> <input type="number" id="vlan-input" placeholder="Enter VLAN ID" />
+                </div>
             `;
             interfaceSettings.innerHTML = settings;
+        }
+    
+        function toggleVlanInput() {
+            const modeSelect = document.getElementById('switchport-mode');
+            const vlanSetting = document.getElementById('vlan-setting');
+            if (modeSelect.value === 'access') {
+                vlanSetting.style.display = 'block';
+            } else {
+                vlanSetting.style.display = 'none';
+            }
         }
     
         function toggleStatus(interface) {
