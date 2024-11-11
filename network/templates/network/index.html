@@ -4,8 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hálózati Eszköz Manager</title>
-    <link rel="stylesheet" href="static/css/style.css">
 </head>
+<style>
+    body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7fa;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    }
+    #container {
+        display: flex;
+        width: 100%;
+        max-width: 1200px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        background-color: white;
+    }
+    #interface-list {
+        width: 30%;
+        border-right: 1px solid #e0e0e0;
+        padding: 20px;
+        background-color: #f9f9f9;
+    }
+    #settings {
+        width: 70%;
+        padding: 20px;
+    }
+    h1 {
+        margin-bottom: 20px;
+        color: #007BFF;
+    }
+    #ip-input {
+        margin-bottom: 5px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: calc(100% - 150px);
+    }
+    button {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+    button:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+    .interface-item {
+        cursor: pointer;
+        padding: 10px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        margin-bottom: 5px;
+        transition: background-color 0.3s;
+    }
+    .interface-item:hover {
+        background-color: #e9ecef;
+    }
+    .setting {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+    }
+    #alert-box {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        display: none;
+    }
+</style>
 <body>
 
     <h1>Hálózati Eszköz Manager</h1>
@@ -47,21 +125,21 @@
         const interfaceItems = document.getElementById('interface-items');
         const interfaceSettings = document.getElementById('interface-settings');
     
-        connectButton.addEventListener('click', function() {
+        connectButton.addEventListener('click', async function() { // Az eseménykezelőt aszinkronná tesszük
             const ipAddress = ipInput.value;
-    
-            fetch("/connect/" + ipAddress)
-            .then((response) => response.json())
-            .then((json) => {
+
+            try {
+                const response = await fetch("/connect/" + ipAddress);
+                const json = await response.json();
                 const interfaces = Object.keys(json);
                 console.log(interfaces);
-    
+
                 // Clear previous interface items
                 interfaceItems.innerHTML = '';
-    
+
                 // Show general settings buttons when a device is connected
                 generalSettingsButtons.style.display = 'block';
-    
+
                 // Populate the interface list
                 interfaces.forEach(interface => {
                     const li = document.createElement('li');
@@ -70,7 +148,14 @@
                     li.onclick = () => showSettings(interface);
                     interfaceItems.appendChild(li);
                 });
-            });
+
+                // Send commands sequentially
+                await send_command("en"); // Az "en" parancs elküldése
+                await send_command("h"); // A következő parancs elküldése csak az előző után
+
+            } catch (error) {
+                console.error('Error:', error); // Hibakezelés
+            }
         });
     
         function send_command(command_message) {
@@ -85,7 +170,9 @@
             });
         }
     
-        function showSettings(interface) {
+        async function showSettings(interface) {
+            await send_command("conf t");
+            await send_command(`int ${interface}`)
             const settings = `
                 <div class="setting"><strong>Interface:</strong> ${interface}</div>
                 <div class="setting"><strong>Status:</strong> <button onclick="toggleStatus('${interface}')">Toggle On/Off</button></div>
@@ -115,6 +202,7 @@
     
         function toggleStatus(interface) {
             alert(`Toggling status for ${interface}`);
+            send_command("no shutdown")
         }
     
         function showGeneralSettings() {
@@ -149,26 +237,11 @@
             });
         }
     
-        function showVlanDatabase() {
-            // Logic to fetch and display VLAN database
-            fetch("/vlan_database/")
-            .then(response => response.json())
-            .then(data => {
-                // Process and display VLAN data
-                let vlanList = "<h3>VLAN Database</h3><ul>";
-                data.forEach(vlan => {
-                    vlanList += `<li>VLAN ID: ${vlan.id}, Name: ${vlan.name}</li>`;
-                });
-                vlanList += "</ul>";
-                interfaceSettings.innerHTML = vlanList;
-            });
-        }
-    
         function sendAlert(message, color) {
             document.getElementById("alert-text").innerHTML = message;
             document.getElementById("alert-text").style.color = color;
             document.getElementById("alert-box").style.display = "block";
         }
     </script>
-    </body>
+</body>
 </html>

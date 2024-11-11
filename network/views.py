@@ -8,7 +8,7 @@ import json
 # import socket
 # import threading
 
-PORT = 5001
+PORT = 23
 
 # Create your views here.
 def index_view(request):
@@ -24,7 +24,9 @@ def send_command(request):
 def connect(request, ip_address):
     global HOST
     HOST = ip_address
-    response = get_port_status(asyncio.run(send_telnet(HOST, PORT, "sh ip int brief")))
+    print(HOST)
+    print(PORT)
+    response = get_port_status(asyncio.run(send_telnet(HOST, PORT, "sh ip int brief\r\n ")))
     print(response)
     return JsonResponse(response, safe=False)
 
@@ -45,8 +47,17 @@ async def send_telnet(host, port, command):
     writer.close()
 
     # Clean up the response to remove the command and empty line
-    response_lines = response.splitlines()
-    cleaned_response = "\n".join(response_lines[1:][:-1])  # Skip the first two lines
+    response_lines = response.splitlines()[1:][:-1]
+    print(response_lines)
+
+    interfaces = []
+    for interface in response_lines:
+        interface.replace("--More--", "")
+        interfaces.append(interface)
+
+    cleaned_response = "\n".join(interfaces)
+
+    print(cleaned_response)
 
     return cleaned_response
 
