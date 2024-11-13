@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="hu">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +8,13 @@
 </head>
 <style>
     body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7fa;
-    color: #333;
-    margin: 0;
-    padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7fa;
+        color: #333;
+        margin: 0;
+        padding: 20px;
     }
+
     #container {
         display: flex;
         width: 100%;
@@ -22,20 +24,24 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         background-color: white;
     }
+
     #interface-list {
         width: 30%;
         border-right: 1px solid #e0e0e0;
         padding: 20px;
         background-color: #f9f9f9;
     }
+
     #settings {
         width: 70%;
         padding: 20px;
     }
+
     h1 {
         margin-bottom: 20px;
         color: #007BFF;
     }
+
     #ip-input {
         margin-bottom: 5px;
         padding: 10px;
@@ -43,6 +49,7 @@
         border-radius: 4px;
         width: calc(100% - 150px);
     }
+
     button {
         background-color: #007BFF;
         color: white;
@@ -54,10 +61,12 @@
         cursor: pointer;
         transition: background-color 0.3s, transform 0.2s;
     }
+
     button:hover {
         background-color: #0056b3;
         transform: scale(1.05);
     }
+
     .interface-item {
         cursor: pointer;
         padding: 10px;
@@ -66,9 +75,11 @@
         margin-bottom: 5px;
         transition: background-color 0.3s;
     }
+
     .interface-item:hover {
         background-color: #e9ecef;
     }
+
     .setting {
         margin-top: 10px;
         padding: 10px;
@@ -76,6 +87,7 @@
         border-radius: 4px;
         background-color: #f9f9f9;
     }
+
     #alert-box {
         margin-top: 20px;
         padding: 10px;
@@ -84,6 +96,7 @@
         display: none;
     }
 </style>
+
 <body>
 
     <h1>Hálózati Eszköz Manager</h1>
@@ -107,6 +120,7 @@
             </ul>
             <h2>Interfaces</h2>
             <ul id="interface-items">
+                <div id="interface-item" onclick="showSettings()">Test</div>
                 <!-- Interface items will be dynamically added here -->
             </ul>
         </div>
@@ -124,8 +138,8 @@
         const generalSettingsButtons = document.getElementById('general-settings');
         const interfaceItems = document.getElementById('interface-items');
         const interfaceSettings = document.getElementById('interface-settings');
-    
-        connectButton.addEventListener('click', async function() { // Az eseménykezelőt aszinkronná tesszük
+
+        connectButton.addEventListener('click', async function () { // Az eseménykezelőt aszinkronná tesszük
             const ipAddress = ipInput.value;
 
             try {
@@ -157,7 +171,7 @@
                 console.error('Error:', error); // Hibakezelés
             }
         });
-    
+
         function send_command(command_message) {
             fetch("/send_command/", {
                 method: "POST",
@@ -169,42 +183,75 @@
                 }),
             });
         }
-    
+
         async function showSettings(interface) {
             await send_command("conf t");
             await send_command(`int ${interface}`)
             const settings = `
                 <div class="setting"><strong>Interface:</strong> ${interface}</div>
-                <div class="setting"><strong>Status:</strong> <button onclick="toggleStatus('${interface}')">Toggle On/Off</button></div>
-                <div class="setting"><strong>IP Address:</strong> <input type="text" placeholder="Enter IP Address" /></div>
-                <div class="setting"><strong>Switchport Mode:</strong>
+                <div class="setting"><strong>Állapot:</strong> <button onclick="toggleStatus('${interface}')">Be/Ki</button></div>
+                <div class="setting"><strong>Ipv4 cím:</strong> <input type="text" placeholder="0.0.0.0" /></div>
+                <div class="setting"><strong>Switchport Mód:</strong>
                     <select id="switchport-mode" onchange="toggleVlanInput()">
-                        <option value="access">Access</option>
-                        <option value="trunk">Trunk</option>
+                        <option value="swdynamic">Dinamikus</option>
+                        <option value="swaccess">Access</option>
+                        <option value="swtrunk">Trunk</option>
                     </select>
                 </div>
                 <div class="setting" id="vlan-setting" style="display: none;">
-                    <strong>VLAN ID:</strong> <input type="number" id="vlan-input" placeholder="Enter VLAN ID" />
+                    <strong>VLAN ID:</strong> <input type="number" id="vlan-input" placeholder="VLAN szám" />
                 </div>
+                <div class="setting"><strong>Portbiztonság</strong>
+                    <div class="setting"><strong>Típus:</strong>
+                        <select id="port-security-type" onchange="toggleMACInput()">
+                            <option value="psstatic">Statikus</option>
+                            <option value="pssticky">Sticky</option>
+                        </select>
+                        <div class="setting" id="set-mac-address">
+                            <strong>MAC-cím:</strong> <input type="text" id="mac-address" placeholder="00:00:00:00:00:00" />
+                        </div>
+                    </div>
+                    <div class="setting" id="max-users-settings">
+                        <strong>Maximum felhasználók:</strong> <input type="number" id="maxusers" placeholder="0" />
+                    </div>
+                    <div class="setting" id="violation"><strong>Szabálysértés esetén:</strong>
+                        <select id="port-security-violation">
+                            <option value="vshutdown">Lekapcsolás</option>
+                            <option value="vprotect">Védelem</option>
+                            <option value="vrestrict">Korlátozás</option>
+                        </select>
+                    </div>
+                </div>
+                        
             `;
             interfaceSettings.innerHTML = settings;
         }
-    
+
         function toggleVlanInput() {
             const modeSelect = document.getElementById('switchport-mode');
             const vlanSetting = document.getElementById('vlan-setting');
-            if (modeSelect.value === 'access') {
+            if (modeSelect.value === 'swaccess') {
                 vlanSetting.style.display = 'block';
             } else {
                 vlanSetting.style.display = 'none';
             }
         }
-    
+
+        function toggleMACInput() {
+            const modeSelect = document.getElementById('port-security-type');
+            const macInput = document.getElementById('set-mac-address');
+            if (modeSelect.value === 'pssticky') {
+                macInput.style.display = 'none';
+            } else {
+                macInput.style.display = 'block';
+            }
+        }
+
         function toggleStatus(interface) {
             alert(`Toggling status for ${interface}`);
             send_command("no shutdown")
         }
-    
+
         function showGeneralSettings() {
             const settings = `
                 <div class="setting"><strong>Hostname:</strong> 
@@ -214,11 +261,11 @@
             `;
             interfaceSettings.innerHTML = settings;
         }
-    
+
         function changeHostname() {
             const hostnameInput = document.getElementById('hostname-input');
             const newHostname = hostnameInput.value;
-    
+
             // Logic to change the hostname
             fetch("/change_hostname/", {
                 method: "POST",
@@ -236,7 +283,7 @@
                 }
             });
         }
-    
+
         function sendAlert(message, color) {
             document.getElementById("alert-text").innerHTML = message;
             document.getElementById("alert-text").style.color = color;
@@ -244,4 +291,5 @@
         }
     </script>
 </body>
+
 </html>
