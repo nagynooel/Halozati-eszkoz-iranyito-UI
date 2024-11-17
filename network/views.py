@@ -1,81 +1,82 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponse
-import asyncio
-import telnetlib3
-import json
-# import socket
-# import threading
-
-PORT = 23
+import paramiko
+import threading
 
 # Create your views here.
 def index_view(request):
     return render(request, "network/index.html")
 
 @csrf_exempt
-def send_command(request):
-    if request.method == "POST":
-        asyncio.run(send_telnet(HOST, PORT, json.loads(request.body)["command"]))
-  
-    return HttpResponse("Teszt")
-
 def connect(request, ip_address):
-    global HOST
-    HOST = ip_address
-    print(HOST)
-    print(PORT)
-    response = get_port_status(asyncio.run(send_telnet(HOST, PORT, "sh ip int brief\r\n ")))
-    print(response)
-    return JsonResponse(response, safe=False)
+    host = ip_address
+    port = 22  # Default SSH port
 
-async def send_telnet(host, port, command):
-    reader, writer = await telnetlib3.open_connection(host, port)
+    global client
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    # Clear the buffer
-    await reader.read(100000)  # Read any leftover data in the buffer
+    try:
+        client.connect(hostname=host, port=port, username='your_username', password='your_password')
+        receive_thread = threading.Thread(target=receive_messages)
+        receive_thread.start()
+    except Exception as e:
+        return HttpResponse("Error: " + str(e))
 
-    # Send command
-    writer.write(command + '\r\n')
-    await writer.drain()
+    interfaces = get_switch_interfaces()
+    
+    return HttpResponse(interfaces)
 
-    # Wait for the command to be executed and read the response
-    await asyncio.sleep(2)  # Increase wait time to ensure the response is received
-    response = await reader.read(100000)  # Adjust the buffer size as needed
+def receive_messages():
+    global last_message
+    while True:
+        try:
+            stdin, stdout, stderr = client.exec_command("show ip interface brief")
+            last_message = stdout.read().decode('utf-8')
+            break
+        except Exception as e:
+            print(e)
+            break
+    client.close()
 
-    writer.close()
+def send_message(message):
+    if client:
+        stdin, stdout, stderr = client.exec_command(message)
+        print("Sent")
 
-    # Clean up the response to remove the command and empty line
-    response_lines = response.splitlines()[1:][:-1]
-    print(response_lines)
+def get_switch_interfaces():
+    send_message("show ip interface brief")
+    
+    import time
+    time.sleep(2)
 
     interfaces = []
-    for interface in response_lines:
-        interface.replace("--More--", "")
-        interfaces.append(interface)
+    print(last_message)
 
-    cleaned_response = "\n".join(interfaces)
-
-    print(cleaned_response)
-
-    return cleaned_response
-
-def get_port_status(response):
-    interfaces = {}
-
-    for message in response.splitlines():
+    for message in last_message.splitlines():
         if "Interface" in message and "Status" in message:
-            # Átugorjuk a fejlécet
             continue
-        if message.strip():  # Ellenőrizzük, hogy nem üres-e a sor
+        if message.strip():
             parts = message.split()
-            if len(parts) >= 2:  # Ellenőrizzük, hogy van elég elem a sorban
+            if len(parts) >= 2:
                 interface_name = parts[0]
-                interface_status = parts[5]
-                interfaces[interface_name] = interface_status
+                interface_status = parts[4]
+                interfaces.append((interface_name, interface_status))
 
     return interfaces
+
+@csrf_exempt
+def send_command(request):
+    if request.method == "POST":
+        command = request.POST.get('command', '')
+        if command:
+            send_message(command)
+            return JsonResponse({"status": "success", "message": "Command sent"})
+        else:
+            return JsonResponse({"status": "error", "message": "No command provided"})
+    return JsonResponse({"status": "error", "message": "Invalid request method"})
 
 # @csrf_exempt
 # def connect(request, ip_address):
