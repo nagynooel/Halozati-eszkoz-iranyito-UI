@@ -5,113 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hálózati Eszköz Manager</title>
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
-<style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f4f7fa;
-        color: #333;
-        margin: 0;
-        padding: 20px;
-    }
-
-    #container {
-        display: flex;
-        width: 100%;
-        max-width: 1200px;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        background-color: white;
-    }
-
-    #interface-list {
-        width: 30%;
-        border-right: 1px solid #e0e0e0;
-        padding: 20px;
-        background-color: #f9f9f9;
-    }
-
-    #settings {
-        width: 70%;
-        padding: 20px;
-    }
-
-    h1 {
-        margin-bottom: 20px;
-        color: #007BFF;
-    }
-
-    #ip-input {
-        margin-bottom: 5px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        width: calc(100% - 150px);
-    }
-
-    button {
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        font-size: 14px;
-        font-family: Arial, sans-serif;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.2s;
-    }
-
-    button:hover {
-        background-color: #0056b3;
-        transform: scale(1.05);
-    }
-
-    .interface-item {
-        cursor: pointer;
-        padding: 10px;
-        border: 1px solid transparent;
-        border-radius: 4px;
-        margin-bottom: 5px;
-        transition: background-color 0.3s;
-    }
-
-    .interface-item:hover {
-        background-color: #e9ecef;
-    }
-
-    .setting {
-        margin-top: 10px;
-        padding: 10px;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        background-color: #f9f9f9;
-    }
-
-    #alert-box {
-        margin-top: 20px;
-        padding: 10px;
-        border: 1px solid transparent;
-        border-radius: 4px;
-        display: none;
-    }
-</style>
 
 <body>
-
+    <button id="test-button" onclick="document.getElementById('container').classList.remove('hide')" style="position: fixed; top: 10px; right: 10px">Teszt</button>
+    <div id="alert-container"></div>
     <h1>Hálózati Eszköz Manager</h1>
-    <div>
-        <input type="text" id="ip-input" name="ip-input" placeholder="Enter Device IP Address" />
+    <form action="/connect" method="post" id="connection-container">
+        <h2>SSH csatlakozás</h2>
+        <div class="input-group">
+            <input type="text" id="ip-input" name="ip-input" placeholder="IP cím" />
+            <input type="number" id="port-input" name="port-input" placeholder="Port" />
+        </div>
+        <input type="text" id="username-input" name="username-input" placeholder="Felhasználónév" />
+        <input type="password" id="password-input" name="password-input" placeholder="Jelszó" />
         <button type="submit" id="connect-button">Kapcsolódás</button>
-    </div>
+    </form>
 
-    <div id="alert-box" style="display: none;">
-        <h3 id="alert-text">Sikeres csatlakozás</h3>
-    </div>
-
-    <button style="margin:10px" onclick="send_command('conf t')">Send</button>
-
-    <div id="container">
+    <div id="container" class="hide">
         <div id="interface-list">
             <h2>General settings</h2>
             <ul id="general-settings" style="display: none;">
@@ -288,6 +200,33 @@
             document.getElementById("alert-text").innerHTML = message;
             document.getElementById("alert-text").style.color = color;
             document.getElementById("alert-box").style.display = "block";
+        }
+
+        function sendAlert(message, type) {
+            const alertContainer = document.getElementById("alert-container");
+            const alertBox = document.createElement("div");
+            alertBox.className = `alert ${type} show`;
+            alertBox.innerHTML = `
+        <span>${message}</span>
+        <button class="close-alert" onclick="closeAlert(this)">X</button>
+    `;
+            alertContainer.appendChild(alertBox);
+
+            // Fade out after 5 seconds
+            setTimeout(() => {
+                alertBox.classList.remove("show");
+                setTimeout(() => {
+                    alertContainer.removeChild(alertBox);
+                }, 500); // Wait for fade out to finish before removing
+            }, 5000);
+        }
+
+        function closeAlert(button) {
+            const alertBox = button.parentElement;
+            alertBox.classList.remove("show");
+            setTimeout(() => {
+                alertBox.parentElement.removeChild(alertBox);
+            }, 500); // Wait for fade out to finish before removing
         }
     </script>
 </body>
