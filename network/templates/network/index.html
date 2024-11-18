@@ -9,40 +9,48 @@
 </head>
 
 <body>
-    <button id="test-button" onclick="document.getElementById('container').classList.remove('hide')" style="position: fixed; top: 10px; right: 10px">Teszt</button>
-    <div id="alert-container"></div>
-    <h1>Hálózati Eszköz Manager</h1>
-    <form action="/connect" method="post" id="connection-container">
-        <h2>SSH csatlakozás</h2>
-        <div class="input-group">
-            <input type="text" id="ip-input" name="ip-input" placeholder="IP cím" />
-            <input type="number" id="port-input" name="port-input" placeholder="Port" />
+    <body>
+        <button id="test-button" onclick="document.getElementById('container').classList.remove('hide');document.getElementById('connection-status').classList.remove('hide');document.getElementById('connection-container').classList.add('hide')" style="position: fixed; top: 10px; right: 10px">Teszt</button>
+        <div id="alert-container"></div>
+        <h1>Kapcsoló Manager</h1>
+        <form action="/connect" method="post" id="connection-container">
+            <h2>SSH csatlakozás</h2>
+            <div class="input-group">
+                <input type="text" id="ip-input" name="ip-input" placeholder="IP cím" />
+                <input type="number" id="port-input" name="port-input" placeholder="Port" />
+            </div>
+            <input type="text" id="username-input" name="username-input" placeholder="Felhasználónév" />
+            <input type="password" id="password-input" name="password-input" placeholder="Jelszó" />
+            <button type="submit" id="connect-button">Kapcsolódás</button>
+        </form>
+    
+        <div id="connection-status" class="connection-status hide">
+            <span class="status-dot"></span>
+            <span id="connection-message">Kapcsolódva: <span id="connected-ip">0.0.0.0</span>:<span id="connected-port">0</span>, Típus: <span id="connection-type">SSH</span></span>
+            <button id="disconnect-button" onclick="" style="background-color: red;">Szétkapcsolás</button>
         </div>
-        <input type="text" id="username-input" name="username-input" placeholder="Felhasználónév" />
-        <input type="password" id="password-input" name="password-input" placeholder="Jelszó" />
-        <button type="submit" id="connect-button">Kapcsolódás</button>
-    </form>
-
-    <div id="container" class="hide">
-        <div id="interface-list">
-            <h2>General settings</h2>
-            <ul id="general-settings" style="display: none;">
-                <div id="interface-item" onclick="showGeneralSettings()">General Settings</div>
-                <div id="interface-item" onclick="showVlanDatabase()">VLAN Database</div>
-            </ul>
-            <h2>Interfaces</h2>
-            <ul id="interface-items">
-                <div id="interface-item" onclick="showSettings()">Test</div>
-                <!-- Interface items will be dynamically added here -->
-            </ul>
-        </div>
-        <div id="settings">
-            <h2>Settings</h2>
-            <div id="interface-settings">
-                <!-- Settings for the selected interface will be displayed here -->
+    
+        <div id="container" class="hide">
+            <div id="interface-list">
+                <h2>General settings</h2>
+                <ul id="general-settings" style="display: none;">
+                    <div id="interface-item" onclick="showGeneralSettings()">General Settings</div>
+                    <div id="interface-item" onclick="showVlanDatabase()">VLAN Database</div>
+                </ul>
+                <h2>Interfaces</h2>
+                <ul id="interface-items">
+                    <div id="interface-item" onclick="showSettings()">Test</div>
+                    <!-- Interface items will be dynamically added here -->
+                </ul>
+            </div>
+            <div id="settings">
+                <h2>Settings</h2>
+                <div id="interface-settings">
+                    <!-- Settings for the selected interface will be displayed here -->
+                </div>
             </div>
         </div>
-    </div>
+    </body>
 
     <script>
         const connectButton = document.getElementById('connect-button');

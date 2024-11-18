@@ -76,8 +76,7 @@ button:hover {
 
 #container {
     display: flex;
-    width: 100%;
-    max-width: 1200px;
+    width: 85%;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -203,4 +202,48 @@ button:hover {
 .alert.success .close-alert:hover {
     background-color: rgba(0, 255, 0, 0.1); /* Light green background for success */
     color: green; /* Change text color to green */
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    /*background-color: #f9f9f9;  Background color for the status bar */
+    padding: 10px; /* Padding around the status bar */
+    border-bottom: 2px solid #007BFF; /* Bottom border for separation */
+    margin: auto; /* Remove margin to eliminate space */
+    width: 85%; /* Ensure it takes the full width of the container */
+}
+
+.hide {
+    display: none !important; /* Ensure the connection status is hidden when not connected */
+}
+
+@keyframes blinker {
+    50% {
+      background-color: rgb(50, 209, 50);
+    }
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    background-color: green;
+    border-radius: 50%; /* Make it a circle */
+    margin-top: 4px; /* Space between dot and text */
+    margin-right: 5px; /* Space between dot and text */
+    animation: blinker 1s infinite step-end;
+}
+
+#disconnect-button {
+    margin-left: auto; /* Push the button to the right */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#disconnect-button:hover {
+    background-color: darkred; /* Darker red on hover */
 }
