@@ -3,9 +3,7 @@ body {
     background-color: #f4f7fa;
     color: #333;
     margin: 0;
-    padding: 20px;
     display: block; /* Use block layout instead of flexbox */
-    min-height: 100vh; /* Ensure body takes at least full viewport height */
 }
 
 h1 {

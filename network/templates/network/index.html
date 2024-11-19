@@ -13,10 +13,10 @@
         <button id="test-button" onclick="document.getElementById('container').classList.remove('hide');document.getElementById('connection-status').classList.remove('hide');document.getElementById('connection-container').classList.add('hide')" style="position: fixed; top: 10px; right: 10px">Teszt</button>
         <div id="alert-container"></div>
         <h1>Kapcsoló Manager</h1>
-        <form action="/connect" method="post" id="connection-container">
-            <h2>SSH csatlakozás</h2>
+        <form action="/connect" method="post" id="connection-container" onsubmit="return validateForm()">
+            <h2 style="text-align: center; margin-top: 0;">SSH csatlakozás</h2>
             <div class="input-group">
-                <input type="text" id="ip-input" name="ip-input" placeholder="IP cím" required maxlength="15"/>
+                <input type="text" id="ip-input" name="ip-input" placeholder="IP cím" required maxlength="15" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"/>
                 <input type="number" id="port-input" name="port-input" placeholder="Port" required min="0" max="65535"/>
             </div>
             <input type="text" id="username-input" name="username-input" placeholder="Felhasználónév" required/>
@@ -235,6 +235,34 @@
             setTimeout(() => {
                 alertBox.parentElement.removeChild(alertBox);
             }, 500); // Wait for fade out to finish before removing
+        }
+
+        function validateForm() {
+            const ipInput = document.getElementById('ip-input').value;
+            const portInput = document.getElementById('port-input').value;
+            const usernameInput = document.getElementById('username-input').value;
+            const passwordInput = document.getElementById('password-input').value;
+
+            // Validate IP address
+            const ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            if (!ipRegex.test(ipInput)) {
+                sendAlert("Érvénytelen IP cím formátum.", "error");
+                return false;
+            }
+
+            // Validate port
+            if (portInput < 0 || portInput > 65535) {
+                sendAlert("A portnak 0 és 65535 között kell lennie.", "error");
+                return false;
+            }
+
+            // Validate username and password
+            if (usernameInput.trim() === "" || passwordInput.trim() === "") {
+                sendAlert("Felhasználónév és jelszó kötelező.", "error");
+                return false;
+            }
+
+            return true; // If all validations pass
         }
     </script>
 </body>
