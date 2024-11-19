@@ -1,11 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="hu">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hálózati Eszköz Manager</title>
-    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'network/css/style.css' %}">
 </head>
 
 <body>
@@ -16,11 +16,11 @@
         <form action="/connect" method="post" id="connection-container">
             <h2>SSH csatlakozás</h2>
             <div class="input-group">
-                <input type="text" id="ip-input" name="ip-input" placeholder="IP cím" />
-                <input type="number" id="port-input" name="port-input" placeholder="Port" />
+                <input type="text" id="ip-input" name="ip-input" placeholder="IP cím" required maxlength="15"/>
+                <input type="number" id="port-input" name="port-input" placeholder="Port" required min="0" max="65535"/>
             </div>
-            <input type="text" id="username-input" name="username-input" placeholder="Felhasználónév" />
-            <input type="password" id="password-input" name="password-input" placeholder="Jelszó" />
+            <input type="text" id="username-input" name="username-input" placeholder="Felhasználónév" required/>
+            <input type="password" id="password-input" name="password-input" placeholder="Jelszó" required/>
             <button type="submit" id="connect-button">Kapcsolódás</button>
         </form>
     
