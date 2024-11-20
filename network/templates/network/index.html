@@ -4,267 +4,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hálózati Eszköz Manager</title>
+    <title>Kapcsoló Manager</title>
     <link rel="stylesheet" type="text/css" href="{% static 'network/css/style.css' %}">
 </head>
 
 <body>
-    <body>
-        <button id="test-button" onclick="document.getElementById('container').classList.remove('hide');document.getElementById('connection-status').classList.remove('hide');document.getElementById('connection-container').classList.add('hide')" style="position: fixed; top: 10px; right: 10px">Teszt</button>
-        <div id="alert-container"></div>
-        <h1>Kapcsoló Manager</h1>
-        <form action="/connect" method="post" id="connection-container" onsubmit="return validateForm()">
-            <h2 style="text-align: center; margin-top: 0;">SSH csatlakozás</h2>
-            <div class="input-group">
-                <input type="text" id="ip-input" name="ip-input" placeholder="IP cím" required maxlength="15" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"/>
-                <input type="number" id="port-input" name="port-input" placeholder="Port" required min="0" max="65535"/>
-            </div>
-            <input type="text" id="username-input" name="username-input" placeholder="Felhasználónév" required/>
-            <input type="password" id="password-input" name="password-input" placeholder="Jelszó" required/>
-            <button type="submit" id="connect-button">Kapcsolódás</button>
-        </form>
+    <!-- Teszt gomb, amely megjeleníti a kapcsolat állapotát és a kapcsolat űrlapot -->
+    <button id="test-button" onclick="document.getElementById('container').classList.remove('hide');document.getElementById('connection-status').classList.remove('hide');document.getElementById('connection-container').classList.add('hide')" style="position: fixed; top: 10px; right: 10px">Teszt</button>
     
-        <div id="connection-status" class="connection-status hide">
-            <span class="status-dot"></span>
-            <span id="connection-message">Kapcsolódva: <span id="connected-ip">0.0.0.0</span>:<span id="connected-port">0</span>, Típus: <span id="connection-type">SSH</span></span>
-            <button id="disconnect-button" onclick="" style="background-color: red;">Szétkapcsolás</button>
-        </div>
+    <!-- Figyelmeztetések megjelenítésére szolgáló tartály -->
+    <div id="alert-container"></div>
     
-        <div id="container" class="hide">
-            <div id="interface-list">
-                <h2>General settings</h2>
-                <ul id="general-settings" style="display: none;">
-                    <div id="interface-item" onclick="showGeneralSettings()">General Settings</div>
-                    <div id="interface-item" onclick="showVlanDatabase()">VLAN Database</div>
-                </ul>
-                <h2>Interfaces</h2>
-                <ul id="interface-items">
-                    <div id="interface-item" onclick="showSettings()">Test</div>
-                    <!-- Interface items will be dynamically added here -->
-                </ul>
-            </div>
-            <div id="settings">
-                <h2>Settings</h2>
-                <div id="interface-settings">
-                    <!-- Settings for the selected interface will be displayed here -->
-                </div>
+    <h1>Kapcsoló Manager</h1>
+    
+    <!-- SSH kapcsolat űrlap -->
+    <form action="/connect" method="post" id="connection-container" onsubmit="return validateForm()">
+        <h2 style="text-align: center; margin-top: 0;">SSH csatlakozás</h2>
+        <div class="input-group">
+            <!-- IP cím és port bevitel -->
+            <input type="text" id="ip-input" name="ip-input" placeholder="IP cím" required maxlength="15" pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"/>
+            <input type="number" id="port-input" name="port-input" placeholder="Port" required min="0" max="65535"/>
+        </div>
+        <!-- Felhasználónév és jelszó bevitel -->
+        <input type="text" id="username-input" name="username-input" placeholder="Felhasználónév" required/>
+        <input type="password" id="password-input" name="password-input" placeholder="Jelszó" required/>
+        <button type="submit" id="connect-button">Kapcsolódás</button>
+    </form>
+    
+    <!-- Kapcsolat állapotának megjelenítése -->
+    <div id="connection-status" class="connection-status hide">
+        <span class="status-dot"></span>
+        <span id="connection-message">Kapcsolódva: <span id="connected-ip">0.0.0.0</span>:<span id="connected-port">0</span>, Típus: <span id="connection-type">SSH</span></span>
+        <button id="disconnect-button" onclick="" style="background-color: red;">Szétkapcsolás</button>
+    </div>
+    
+    <!-- A fő tartalom, amely a beállításokat és interfészeket tartalmazza -->
+    <div id="container" class="hide">
+        <div id="interface-list">
+            <h2>Általános beállítások</h2>
+            <ul id="general-settings" style="display: none;">
+                <!-- Általános beállítások és VLAN adatbázis megjelenítése -->
+                <div id="interface-item" onclick="showGeneralSettings()">General Settings</div>
+                <div id="interface-item" onclick="showVlanDatabase()">VLAN Database</div>
+            </ul>
+            <h2>Interfészek</h2>
+            <ul id="interface-items">
+                <!-- Teszt interfész -->
+                <div id="interface-item" onclick="showSettings()">Test</div>
+                <!-- Interfészek dinamikus generálása -->
+            </ul>
+        </div>
+        <div id="settings">
+            <h2>Beállítások</h2>
+            <div id="interface-settings">
+                <!-- Interfész beállítások dinamikus generálása -->
             </div>
         </div>
-    </body>
-
-    <script>
-        const connectButton = document.getElementById('connect-button');
-        const ipInput = document.getElementById('ip-input');
-        const generalSettingsButtons = document.getElementById('general-settings');
-        const interfaceItems = document.getElementById('interface-items');
-        const interfaceSettings = document.getElementById('interface-settings');
-
-        connectButton.addEventListener('click', async function () { // Az eseménykezelőt aszinkronná tesszük
-            const ipAddress = ipInput.value;
-
-            try {
-                const response = await fetch("/connect/" + ipAddress);
-                const json = await response.json();
-                const interfaces = Object.keys(json);
-                console.log(interfaces);
-
-                // Clear previous interface items
-                interfaceItems.innerHTML = '';
-
-                // Show general settings buttons when a device is connected
-                generalSettingsButtons.style.display = 'block';
-
-                // Populate the interface list
-                interfaces.forEach(interface => {
-                    const li = document.createElement('li');
-                    li.textContent = interface;
-                    li.className = 'interface-item';
-                    li.onclick = () => showSettings(interface);
-                    interfaceItems.appendChild(li);
-                });
-
-                // Send commands sequentially
-                await send_command("en"); // Az "en" parancs elküldése
-                await send_command("h"); // A következő parancs elküldése csak az előző után
-
-            } catch (error) {
-                console.error('Error:', error); // Hibakezelés
-            }
-        });
-
-        function send_command(command_message) {
-            fetch("/send_command/", {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8"
-                },
-                body: JSON.stringify({
-                    command: command_message
-                }),
-            });
-        }
-
-        async function showSettings(interface) {
-            await send_command("conf t");
-            await send_command(`int ${interface}`)
-            const settings = `
-                <div class="setting"><strong>Interface:</strong> ${interface}</div>
-                <div class="setting"><strong>Állapot:</strong> <button onclick="toggleStatus('${interface}')">Be/Ki</button></div>
-                <div class="setting"><strong>Ipv4 cím:</strong> <input type="text" placeholder="0.0.0.0" /></div>
-                <div class="setting"><strong>Switchport Mód:</strong>
-                    <select id="switchport-mode" onchange="toggleVlanInput()">
-                        <option value="swdynamic">Dinamikus</option>
-                        <option value="swaccess">Access</option>
-                        <option value="swtrunk">Trunk</option>
-                    </select>
-                </div>
-                <div class="setting" id="vlan-setting" style="display: none;">
-                    <strong>VLAN ID:</strong> <input type="number" id="vlan-input" placeholder="VLAN szám" />
-                </div>
-                <div class="setting"><strong>Portbiztonság</strong>
-                    <div class="setting"><strong>Típus:</strong>
-                        <select id="port-security-type" onchange="toggleMACInput()">
-                            <option value="psstatic">Statikus</option>
-                            <option value="pssticky">Sticky</option>
-                        </select>
-                        <div class="setting" id="set-mac-address">
-                            <strong>MAC-cím:</strong> <input type="text" id="mac-address" placeholder="00:00:00:00:00:00" />
-                        </div>
-                    </div>
-                    <div class="setting" id="max-users-settings">
-                        <strong>Maximum felhasználók:</strong> <input type="number" id="maxusers" placeholder="0" />
-                    </div>
-                    <div class="setting" id="violation"><strong>Szabálysértés esetén:</strong>
-                        <select id="port-security-violation">
-                            <option value="vshutdown">Lekapcsolás</option>
-                            <option value="vprotect">Védelem</option>
-                            <option value="vrestrict">Korlátozás</option>
-                        </select>
-                    </div>
-                </div>
-                        
-            `;
-            interfaceSettings.innerHTML = settings;
-        }
-
-        function toggleVlanInput() {
-            const modeSelect = document.getElementById('switchport-mode');
-            const vlanSetting = document.getElementById('vlan-setting');
-            if (modeSelect.value === 'swaccess') {
-                vlanSetting.style.display = 'block';
-            } else {
-                vlanSetting.style.display = 'none';
-            }
-        }
-
-        function toggleMACInput() {
-            const modeSelect = document.getElementById('port-security-type');
-            const macInput = document.getElementById('set-mac-address');
-            if (modeSelect.value === 'pssticky') {
-                macInput.style.display = 'none';
-            } else {
-                macInput.style.display = 'block';
-            }
-        }
-
-        function toggleStatus(interface) {
-            alert(`Toggling status for ${interface}`);
-            send_command("no shutdown")
-        }
-
-        function showGeneralSettings() {
-            const settings = `
-                <div class="setting"><strong>Hostname:</strong> 
-                    <input type="text" id="hostname-input" placeholder="Enter new hostname" />
-                    <button onclick="changeHostname()">Change Hostname</button>
-                </div>
-            `;
-            interfaceSettings.innerHTML = settings;
-        }
-
-        function changeHostname() {
-            const hostnameInput = document.getElementById('hostname-input');
-            const newHostname = hostnameInput.value;
-
-            // Logic to change the hostname
-            fetch("/change_hostname/", {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8"
-                },
-                body: JSON.stringify({
-                    hostname: newHostname
-                }),
-            }).then(response => {
-                if (response.ok) {
-                    sendAlert("Hostname changed successfully!", "green");
-                } else {
-                    sendAlert("Failed to change hostname.", "red");
-                }
-            });
-        }
-
-        function sendAlert(message, color) {
-            document.getElementById("alert-text").innerHTML = message;
-            document.getElementById("alert-text").style.color = color;
-            document.getElementById("alert-box").style.display = "block";
-        }
-
-        function sendAlert(message, type) {
-            const alertContainer = document.getElementById("alert-container");
-            const alertBox = document.createElement("div");
-            alertBox.className = `alert ${type} show`;
-            alertBox.innerHTML = `
-        <span>${message}</span>
-        <button class="close-alert" onclick="closeAlert(this)">X</button>
-    `;
-            alertContainer.appendChild(alertBox);
-
-            // Fade out after 5 seconds
-            setTimeout(() => {
-                alertBox.classList.remove("show");
-                setTimeout(() => {
-                    alertContainer.removeChild(alertBox);
-                }, 500); // Wait for fade out to finish before removing
-            }, 5000);
-        }
-
-        function closeAlert(button) {
-            const alertBox = button.parentElement;
-            alertBox.classList.remove("show");
-            setTimeout(() => {
-                alertBox.parentElement.removeChild(alertBox);
-            }, 500); // Wait for fade out to finish before removing
-        }
-
-        function validateForm() {
-            const ipInput = document.getElementById('ip-input').value;
-            const portInput = document.getElementById('port-input').value;
-            const usernameInput = document.getElementById('username-input').value;
-            const passwordInput = document.getElementById('password-input').value;
-
-            // Validate IP address
-            const ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-            if (!ipRegex.test(ipInput)) {
-                sendAlert("Érvénytelen IP cím formátum.", "error");
-                return false;
-            }
-
-            // Validate port
-            if (portInput < 0 || portInput > 65535) {
-                sendAlert("A portnak 0 és 65535 között kell lennie.", "error");
-                return false;
-            }
-
-            // Validate username and password
-            if (usernameInput.trim() === "" || passwordInput.trim() === "") {
-                sendAlert("Felhasználónév és jelszó kötelező.", "error");
-                return false;
-            }
-
-            return true; // If all validations pass
-        }
-    </script>
+    </div>
+    
+    <!-- JavaScript fájlok betöltése -->
+    <script src="{% static 'network/js/connection.js' %}"></script>
+    <script src="{% static 'network/js/settings.js' %}"></script>
+    <script src="{% static 'network/js/ alert.js' %}"></script>
+    <script src="{% static 'network/js/formValidation.js' %}"></script>
 </body>
 
 </html>

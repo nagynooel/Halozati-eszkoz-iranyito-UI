@@ -1,60 +1,64 @@
+/* Betűtípus és háttér */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f7fa;
     color: #333;
     margin: 0;
-    display: block; /* Use block layout instead of flexbox */
+    display: block;
 }
 
+/* Címek */
 h1 {
     margin-bottom: 20px;
     color: #007BFF;
-    text-align: center; /* Center the title text */
+    text-align: center;
 }
 
+/* Kapcsolódási űrlap */
 #connection-container {
     display: flex;
-    flex-direction: column; /* Stack all fields vertically */
+    flex-direction: column;
     width: 100%;
-    max-width: 400px; /* Set max width to accommodate IP and port fields */
-    background-color: #ffffff; /* Background color for the connection form */
-    padding: 20px; /* Padding inside the connection form */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    margin: 0 auto; /* Center the container horizontally */
+    max-width: 400px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
 }
 
 .input-group {
-    display: flex; /* Align IP and port fields side by side */
-    margin-bottom: 10px; /* Space between the input group and other fields */
+    display: flex;
+    margin-bottom: 10px;
 }
 
 #ip-input {
-    margin-right: 10px; /* Space between IP and port fields */
+    margin-right: 10px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    width: 70%; /* 70% width for IP input */
+    width: 70%;
 }
 
 #port-input {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    width: 30%; /* 30% width for port input */
+    width: 30%;
 }
 
 #username-input,
 #password-input {
-    margin-bottom: 10px; /* Space between fields */
+    margin-bottom: 10px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    width: 100%; /* Full width for username and password fields */
-    max-width: 100%; /* Ensure they do not overflow the container */
-    box-sizing: border-box; /* Include padding and border in the element's total width */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
+/* Gombok */
 button {
     background-color: #007BFF;
     color: white;
@@ -72,6 +76,7 @@ button:hover {
     transform: scale(1.05);
 }
 
+/* Fő tartalom */
 #container {
     display: flex;
     width: 85%;
@@ -79,7 +84,7 @@ button:hover {
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     background-color: white;
-    margin: 20px auto; /* Center the container horizontally and add space above and below */
+    margin: 20px auto;
 }
 
 #interface-list {
@@ -115,20 +120,16 @@ button:hover {
     background-color: #f9f9f9;
 }
 
-.hide {
-    display: none !important;
-}
-
-/*Alert box*/
+/* Figyelmeztetések */
 #alert-container {
-    position: fixed; /* Keep alerts fixed on the screen */
-    top: 20px; /* Distance from the top of the viewport */
+    position: fixed;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
     display: flex;
-    flex-direction: column; /* Stack alerts vertically */
-    gap: 10px; /* Space between alerts */
+    flex-direction: column;
+    gap: 10px;
 }
 
 .alert {
@@ -142,12 +143,12 @@ button:hover {
     align-items: center;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     transition: opacity 0.5s ease;
-    opacity: 0; /* Start hidden */
-    position: relative; /* Allow stacking below each other */
+    opacity: 0;
+    position: relative;
 }
 
 .alert.show {
-    opacity: 1; /* Show when added */
+    opacity: 1;
 }
 
 .alert.success {
@@ -161,7 +162,7 @@ button:hover {
 }
 
 .hide {
-    display: none;
+    display: none !important;
 }
 
 .close-alert {
@@ -170,50 +171,28 @@ button:hover {
     color: inherit;
     font-size: 16px;
     cursor: pointer;
-    margin-left: 20px; /* Adjusted margin for more space */
+    margin-left: 20px;
 }
 
-/* Remove default button hover formatting */
 .close-alert:hover {
-    background: lightgrey; /* No background on hover */
-    color: inherit; /* Keep the text color the same */
-    transform: none; /* Prevent any scaling or transformation */
-    box-shadow: none; /* Ensure no shadow effect */
-}
-
-.close-alert {
-    background: none;
-    border: none;
+    background: lightgrey;
     color: inherit;
-    font-size: 16px;
-    cursor: pointer;
-    margin-left: 20px; /* Adjusted margin for more space */
+    transform: none;
+    box-shadow: none;
 }
 
-/* Change background to light red when hovered on error alert */
-.alert.error .close-alert:hover {
-    background-color: rgba(255, 0, 0, 0.1); /* Light red background for error */
-    color: red; /* Change text color to red */
-}
-
-/* Change background to light green when hovered on success alert */
-.alert.success .close-alert:hover {
-    background-color: rgba(0, 255, 0, 0.1); /* Light green background for success */
-    color: green; /* Change text color to green */
-}
-
+/* Kapcsolat állapot */
 .connection-status {
     display: flex;
     align-items: center;
-    /*background-color: #f9f9f9;  Background color for the status bar */
-    padding: 10px; /* Padding around the status bar */
-    border-bottom: 2px solid #007BFF; /* Bottom border for separation */
-    margin: auto; /* Remove margin to eliminate space */
-    width: 85%; /* Ensure it takes the full width of the container */
+    padding: 10px;
+    border-bottom: 2px solid #007BFF;
+    margin: auto;
+    width: 85%;
 }
 
 .hide {
-    display: none !important; /* Ensure the connection status is hidden when not connected */
+    display: none !important;
 }
 
 @keyframes blinker {
@@ -226,14 +205,14 @@ button:hover {
     width: 10px;
     height: 10px;
     background-color: green;
-    border-radius: 50%; /* Make it a circle */
-    margin-top: 4px; /* Space between dot and text */
-    margin-right: 5px; /* Space between dot and text */
+    border-radius: 50%;
+    margin-top: 4px;
+    margin-right: 5px;
     animation: blinker 1s infinite step-end;
 }
 
 #disconnect-button {
-    margin-left: auto; /* Push the button to the right */
+    margin-left: auto;
     color: white;
     border: none;
     padding: 10px 15px;
@@ -243,5 +222,5 @@ button:hover {
 }
 
 #disconnect-button:hover {
-    background-color: darkred; /* Darker red on hover */
+    background-color: darkred;
 }
