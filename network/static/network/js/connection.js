@@ -146,3 +146,8 @@ function toggleStatus(interface) {
     alert(`Állapot váltás: ${interface}`);
     send_command("no shutdown")
 }
+
+function close_connection() {
+    fetch("/close/")
+    console.log("Connection closed")
+}
