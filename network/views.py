@@ -25,11 +25,11 @@ def connect(request):
         receive_thread = threading.Thread(target=receive_messages)
         receive_thread.start()
     except Exception as e:
-        return JsonResponse("{Error: '" + str(e) + "'}")
+        return JsonResponse("{Error: '" + str(e) + "'}", safe=False)
 
     interfaces = get_switch_interfaces()
     
-    return JsonResponse(interfaces)
+    return JsonResponse(interfaces, safe=False)
 
 def receive_messages():
     global last_message

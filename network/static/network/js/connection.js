@@ -26,26 +26,26 @@ function validateForm() {
     }
 
     // Port számának ellenőrzése (0-65535 között)
-    if (portInput < 0 || portInput > 65535) {
+    if (port < 0 || port > 65535) {
         sendAlert("A portnak 0 és 65535 között kell lennie.", "error");
         return false;
     }
 
     // Felhasználónév és jelszó kötelező mezők ellenőrzése
-    if (usernameInput.trim() === "" || passwordInput.trim() === "") {
+    if (username.trim() === "" || password.trim() === "") {
         sendAlert("Felhasználónév és jelszó kötelező.", "error");
         return false;
     }
 
     // Minden ellenőrzés sikeres, készen áll a csatlakozásra
-    connect(ipInput, portInput, usernameInput, passwordInput);
+    connect(ip, port, username, password);
     return false;
 }
 
 // Kapcsolódás a kapcsolóhoz
 async function connect(ip, port, username, password) {
     try {
-        const response = await fetch("/send_command/", {
+        const response = await fetch("/connect/", {
             method: "POST",
             headers: {
                 "Content-type": "application/json; charset=UTF-8"
@@ -59,6 +59,8 @@ async function connect(ip, port, username, password) {
         });
         const json = await response.json();
         const interfaces = Object.keys(json);
+
+        console.log(json)
         
         interfaceItems.innerHTML = '';
         generalSettingsButtons.style.display = 'block';
@@ -77,7 +79,6 @@ async function connect(ip, port, username, password) {
         document.getElementById('connection-container').classList.add('hide');
 
         await send_command("en");
-        await send_command("h");
 
     } catch (error) {
         console.error('Hiba:', error);
