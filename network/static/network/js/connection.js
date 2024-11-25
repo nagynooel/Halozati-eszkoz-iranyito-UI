@@ -78,8 +78,6 @@ async function connect(ip, port, username, password) {
         document.getElementById('connection-status').classList.remove('hide');
         document.getElementById('connection-container').classList.add('hide');
 
-        await send_command("en");
-
     } catch (error) {
         console.error('Hiba:', error);
     }
@@ -95,6 +93,10 @@ function send_command(command_message) {
         body: JSON.stringify({
             command: command_message
         }),
+    }).then((response) => {
+        return response.json()
+    }).then(response => {
+        console.log(response)
     });
 }
 

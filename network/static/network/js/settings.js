@@ -32,19 +32,19 @@ function changeHostname() {
     const hostnameInput = document.getElementById('hostname-input'); // Hostname bemeneti mező
     const newHostname = hostnameInput.value; // Új hostname érték
 
-    fetch("/change_hostname/", { // Kérés küldése a hostname megváltoztatására
+    fetch("/send_command/", { // Kérés küldése a hostname megváltoztatására
         method: "POST",
         headers: {
             "Content-type": "application/json; charset=UTF-8"
         },
         body: JSON.stringify({
-            hostname: newHostname // Az új hostname JSON formátumban
+            command: "en\nconf t\nhostname teszt"
         }),
     }).then(response => {
         if (response.ok) { // Ha a válasz sikeres
-            sendAlert("Hostname sikeresen megváltoztatva!", "green"); // Sikeres üzenet
+            sendAlert("Hostname sikeresen megváltoztatva!", "success"); // Sikeres üzenet
         } else {
-            sendAlert("Hostname megváltoztatása sikertelen.", "red"); // Sikertelen üzenet
+            sendAlert("Hostname megváltoztatása sikertelen.", "error"); // Sikertelen üzenet
         }
     });
 }
