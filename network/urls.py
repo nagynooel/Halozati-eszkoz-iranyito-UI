@@ -6,6 +6,6 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.index_view, name="index"),
-    path('connect/<str:ip_address>/', views.connect, name="connect"),
+    path('connect/', views.connect, name="connect"),
     path('send_command/', views.send_command, name="send_command")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

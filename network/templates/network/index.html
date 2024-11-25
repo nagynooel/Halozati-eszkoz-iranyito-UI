@@ -18,7 +18,7 @@
     <h1>Kapcsoló Manager</h1>
     
     <!-- SSH kapcsolat űrlap -->
-    <form action="/connect" method="post" id="connection-container" onsubmit="return validateForm()">
+    <form id="connection-container" onsubmit="return validateForm()">
         <h2 style="text-align: center; margin-top: 0;">SSH csatlakozás</h2>
         <div class="input-group">
             <!-- IP cím és port bevitel -->
@@ -65,8 +65,7 @@
     <!-- JavaScript fájlok betöltése -->
     <script src="{% static 'network/js/connection.js' %}"></script>
     <script src="{% static 'network/js/settings.js' %}"></script>
-    <script src="{% static 'network/js/ alert.js' %}"></script>
-    <script src="{% static 'network/js/formValidation.js' %}"></script>
+    <script src="{% static 'network/js/alert.js' %}"></script>
 </body>
 
 </html>

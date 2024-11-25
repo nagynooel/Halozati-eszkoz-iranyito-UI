@@ -10,24 +10,26 @@ def index_view(request):
     return render(request, "network/index.html")
 
 @csrf_exempt
-def connect(request, ip_address):
-    host = ip_address
-    port = 22  # Default SSH port
+def connect(request):
+    host = request.POST.get("ip", "")
+    port = request.POST.get("port", "")
+    username = request.POST.get("username", "")
+    password = request.POST.get("password", "")
 
     global client
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     try:
-        client.connect(hostname=host, port=port, username='your_username', password='your_password')
+        client.connect(hostname=host, port=port, username=username, password=password)
         receive_thread = threading.Thread(target=receive_messages)
         receive_thread.start()
     except Exception as e:
-        return HttpResponse("Error: " + str(e))
+        return JsonResponse("{Error: '" + str(e) + "'}")
 
     interfaces = get_switch_interfaces()
     
-    return HttpResponse(interfaces)
+    return JsonResponse(interfaces)
 
 def receive_messages():
     global last_message
