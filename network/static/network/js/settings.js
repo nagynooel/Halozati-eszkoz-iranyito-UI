@@ -7,7 +7,11 @@ function showSettings(interface) {
             <strong>Állapot:</strong>
             <button class="state-button" style='background-color: ${(clickedElement.dataset.state == "up") ? "red" : "green"};' onclick='setState("${interface}", "${(clickedElement.dataset.state == "up") ? "down" : "up"}")')>${(clickedElement.dataset.state == "up") ? "Lekapcsolás" : "Felkapcsolás"}</button>
         </div>
-        <div class="setting"><strong>Ipv4 cím:</strong> <input type="text" placeholder="0.0.0.0" value="${clickedElement.dataset.ip}"/></div>
+        <div class="setting"><strong>Ipv4 cím:</strong>
+            <input type="text" id="ip-address-input" placeholder="0.0.0.0" value="${clickedElement.dataset.ip}"/>
+            <strong>Alhálózati Maszk:</strong>
+            <input type="text" id="subnet-mask-input" placeholder="0.0.0.0" value="${clickedElement.dataset.netmask}" />
+        </div>
         <div class="setting"><strong>Switchport Mód:</strong>
             <select id="switchport-mode" onchange="toggleVlanInput()">
                 <option value="swdynamic" ${(clickedElement.dataset.swmode == "swdynamic") ? "selected" : ""}>Dinamikus</option>
@@ -78,7 +82,8 @@ function setState(interface, state) {
 }
 
 function saveChanges(interface) {
-    return false
+    const ipInput = document.getElementById("ip-address-input")
+    const netmaskInput = document.getElementById("netmask-input")
 }
 
 function showGeneralSettings() {
