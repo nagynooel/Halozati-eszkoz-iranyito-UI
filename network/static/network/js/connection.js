@@ -69,7 +69,17 @@ async function connect(ip, port, username, password) {
             const li = document.createElement('li');
             li.textContent = interface;
             li.className = 'interface-item';
-            li.onclick = () => showSettings(interface);
+            li.id = 'interface-' + interface;
+            li.onclick = () => showSettings(interface)
+            li.datatset.state = json[interface]
+            li.datatset.ip = ""
+            li.datatset.swmode = ""
+            li.datatset.swaccessvlan = ""
+            li.datatset.swtrunkvlan = ""
+            li.datatset.pstype = ""
+            li.datatset.psstaticmac = ""
+            li.datatset.psmaxuser = ""
+            li.datatset.psviolation = ""
             interfaceItems.appendChild(li);
         });
 
@@ -98,55 +108,6 @@ function send_command(command_message) {
     }).then(response => {
         console.log(response)
     });
-}
-
-// Kapcsoló beállításainak megjelenítése
-async function showSettings(interface) {
-    await send_command("conf t");
-    await send_command(`int ${interface}`)
-    const settings = `
-        <div class="setting"><strong>Interface:</strong> ${interface}</div>
-        <div class="setting"><strong>Állapot:</strong> <button onclick="toggleStatus('${interface}')">Be/Ki</button></div>
-        <div class="setting"><strong>Ipv4 cím:</strong> <input type="text" placeholder="0.0.0.0" /></div>
-        <div class="setting"><strong>Switchport Mód:</strong>
-            <select id="switchport-mode" onchange="toggleVlanInput()">
-                <option value="swdynamic">Dinamikus</option>
-                <option value="swaccess">Access</option>
-                <option value="swtrunk">Trunk</option>
-            </select>
-        </div>
-        <div class="setting" id="vlan-setting" style="display: none;">
-            <strong>VLAN ID:</strong> <input type="number" id="vlan-input" placeholder="VLAN szám" />
-        </div>
-        <div class="setting"><strong>Portbiztonság</strong>
-            <div class="setting"><strong>Típus:</strong>
-                <select id="port-security-type" onchange="toggleMACInput()">
-                    <option value="psstatic">Statikus</option>
-                    <option value="pssticky">Sticky</option>
-                </select>
-                <div class="setting" id="set-mac-address">
-                    <strong>MAC-cím:</strong> <input type="text" id="mac-address" placeholder="00:00:00:00:00:00" />
-                </div>
-            </div>
-            <div class="setting" id="max-users-settings">
-                <strong>Maximum felhasználók:</strong> <input type="number" id="maxusers" placeholder="0" />
-            </div>
-            <div class="setting" id="violation"><strong>Szabálysértés esetén:</strong>
-                <select id="port-security-violation">
-                    <option value="vshutdown">Lekapcsolás</option>
-                    <option value="vprotect">Védelem</option>
-                    <option value="vrestrict">Korlátozás</option>
-                </select>
-            </div>
-        </div>
-    `;
-    interfaceSettings.innerHTML = settings;
-}
-
-// Kapcsoló állapotának váltása
-function toggleStatus(interface) {
-    alert(`Állapot váltás: ${interface}`);
-    send_command("no shutdown")
 }
 
 function close_connection() {
