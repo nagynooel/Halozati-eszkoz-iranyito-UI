@@ -65,14 +65,14 @@ function setState(interface, state) {
     let interfaceElement = document.getElementById(`interface-${interface}`)
 
     if(state == "up"){
-        send_command(`en\nconf t\nint ${interface}\nno shu`)
+        send_command(`enable\nconfigure terminal\ninterface ${interface}\nno shutdown`)
         console.log(`${interface}: Changed state to up`)
         button.innerHTML = "Lekapcsolás"
         button.style.background = "red"
         button.onclick = () => setState(interface, "down")
         interfaceElement.dataset.state = "up"
     } else {
-        send_command(`en\nconf t\nint ${interface}\nshu`)
+        send_command(`enable\nconfigure terminal\ninterface ${interface}\nshutdown`)
         console.log(`${interface}: Changed state to down`)
         button.innerHTML = "Felkapcsolás"
         button.style.background = "green"

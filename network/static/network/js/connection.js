@@ -71,15 +71,15 @@ async function connect(ip, port, username, password) {
             li.className = 'interface-item';
             li.id = 'interface-' + interface;
             li.onclick = () => showSettings(interface)
-            li.datatset.state = json[interface]
-            li.datatset.ip = ""
-            li.datatset.swmode = ""
-            li.datatset.swaccessvlan = ""
-            li.datatset.swtrunkvlan = ""
-            li.datatset.pstype = ""
-            li.datatset.psstaticmac = ""
-            li.datatset.psmaxuser = ""
-            li.datatset.psviolation = ""
+            li.dataset.state = json[interface]
+            li.dataset.ip = ""
+            li.dataset.swmode = ""
+            li.dataset.swaccessvlan = ""
+            li.dataset.swtrunkvlan = ""
+            li.dataset.pstype = ""
+            li.dataset.psstaticmac = ""
+            li.dataset.psmaxuser = ""
+            li.dataset.psviolation = ""
             interfaceItems.appendChild(li);
         });
 
