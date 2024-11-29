@@ -39,6 +39,8 @@ function validateForm() {
 
     // Minden ellenőrzés sikeres, készen áll a csatlakozásra
     connect(ip, port, username, password);
+    document.getElementById("connected-ip").innerHTML = ip
+    document.getElementById("connected-ip").innerHTML = port
     return false;
 }
 
@@ -66,20 +68,23 @@ async function connect(ip, port, username, password) {
         generalSettingsButtons.style.display = 'block';
 
         interfaces.forEach(interface => {
+            if(interface == "general") {
+                return
+            }
             const li = document.createElement('li');
             li.textContent = interface;
             li.className = 'interface-item';
             li.id = 'interface-' + interface;
             li.onclick = () => showSettings(interface)
-            li.dataset.state = json[interface]
-            li.dataset.ip = ""
-            li.dataset.swmode = ""
-            li.dataset.swaccessvlan = ""
-            li.dataset.swtrunkvlan = ""
-            li.dataset.pstype = ""
-            li.dataset.psstaticmac = ""
-            li.dataset.psmaxuser = ""
-            li.dataset.psviolation = ""
+            li.dataset.state = json[interface].state
+            li.dataset.swmode = json[interface].swmode
+            li.dataset.swaccessvlan = json[interface].swaccessvlan
+            li.dataset.swtrunkvlan = json[interface].swtrunkvlan
+            li.dataset.ps = json[interface].ps
+            li.dataset.pstype = json[interface].pstype
+            li.dataset.psstaticmac = json[interface].psstaticmac
+            li.dataset.psmaxuser = json[interface].psmaxuser
+            li.dataset.psviolation = json[interface].psviolation
             interfaceItems.appendChild(li);
         });
 
@@ -87,6 +92,8 @@ async function connect(ip, port, username, password) {
         document.getElementById('container').classList.remove('hide');
         document.getElementById('connection-status').classList.remove('hide');
         document.getElementById('connection-container').classList.add('hide');
+
+        document.getElementById("connected-hostname").innerHTML = json["general"].hostname
 
     } catch (error) {
         console.error('Hiba:', error);
