@@ -9,9 +9,6 @@
 </head>
 
 <body>
-    <!-- Teszt gomb, amely megjeleníti a kapcsolat állapotát és a kapcsolat űrlapot -->
-    <button id="test-button" onclick="document.getElementById('container').classList.remove('hide');document.getElementById('connection-status').classList.remove('hide');document.getElementById('connection-container').classList.add('hide')" style="position: fixed; top: 10px; right: 10px">Teszt</button>
-    
     <!-- Figyelmeztetések megjelenítésére szolgáló tartály -->
     <div id="alert-container"></div>
     
@@ -48,10 +45,6 @@
             </div>
             <h2>Interfészek</h2>
             <div id="interface-items">
-                <!-- Teszt interfész -->
-                <div id="interface-test" class="interface-item" onclick="showSettings('test')" data-state="up" data-ip="" data-netmask="" data-swmode="swtrunk" data-swaccessvlan="" data-swtrunkvlan="1,2,3" data-pstype="psstatic" data-psstaticmac="1111:1111:1111:1111:1111" data-psmaxuser="5" data-psviolation="vprotect">Test</div>
-                <div id="interface-test" class="interface-item" onclick="showSettings('test')" data-state="up" data-ip="" data-netmask="" data-swmode="swtrunk" data-swaccessvlan="" data-swtrunkvlan="1,2,3" data-pstype="psstatic" data-psstaticmac="1111:1111:1111:1111:1111" data-psmaxuser="5" data-psviolation="vprotect">Test</div>
-                <div id="interface-test" class="interface-item" onclick="showSettings('test')" data-state="up" data-ip="" data-netmask="" data-swmode="swtrunk" data-swaccessvlan="" data-swtrunkvlan="1,2,3" data-pstype="psstatic" data-psstaticmac="1111:1111:1111:1111:1111" data-psmaxuser="5" data-psviolation="vprotect">Test</div>
                 <!-- Interfészek dinamikus generálása -->
             </div>
         </div>

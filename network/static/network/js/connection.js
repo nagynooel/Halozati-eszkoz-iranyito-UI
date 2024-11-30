@@ -73,7 +73,7 @@ async function connect(ip, port, username, password, enablePassword, timer) {
         })
         const json = await response.json()
 
-        if (json["error"].message) {
+        if (json.hasOwnProperty("error")) {
             sendAlert(json["error"].message, "error")
             console.error(`Error: ${json["error"].message}`)
             clearInterval(timer)
@@ -127,6 +127,9 @@ async function connect(ip, port, username, password, enablePassword, timer) {
         clearInterval(timer)
     } catch (error) {
         console.error('Hiba:', error)
+        sendAlert("Kapcsolódási hiba", "error")
+        connectButton.disabled = false
+        connectButton.innerHTML = "Kapcsolódás"
     }
 }
 
@@ -145,6 +148,7 @@ function send_command(command_message) {
     })
 }
 
+// Kapcsolat bezárása
 function close_connection() {
     if (confirm("A nem alkalmazott beállítások elvesznek. Biztos szét akar kapcsolni?") == true) {
         location.reload()

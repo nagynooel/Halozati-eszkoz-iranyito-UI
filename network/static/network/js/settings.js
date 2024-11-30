@@ -20,6 +20,7 @@ function showGeneralSettings() {
     `;
     interfaceSettings.innerHTML = settings; // Beállítások hozzáadása az interfészhez
 }
+
 // Kapcsoló interfész beállításainak megjelenítése
 function showSettings(interface) {
     let clickedElement = document.getElementById("interface-" + interface)
@@ -76,13 +77,7 @@ function showSettings(interface) {
     document.getElementById("port-security-check").dispatchEvent(clickEvent)
 }
 
-function changeHostname() {
-    const newHostName = document.getElementById("hostname-input").value
-    send_command("configure terminal\nhostname " + newHostName)
-    console.log("General: Hostname set to " + newHostName)
-    document.getElementById("connected-hostname").innerHTML = newHostName
-}
-
+// Általános beállítások alkalmazása
 function saveGeneralSettings() {
     const generalSettings = document.getElementById('general-settings')
 
@@ -199,6 +194,7 @@ function saveGeneralSettings() {
         }
     }
 
+    sendAlert("Beállítások sikeresen alkalmazva lettek!", "success")
 }
 
 function saveRunningConfig() {
@@ -206,6 +202,8 @@ function saveRunningConfig() {
         send_command("write")
         console.log("General: Saved running-config into startup config")
     }
+
+    sendAlert("Running config elmentve", "success")
 }
 
 // Kapcsoló állapotának váltása
@@ -221,6 +219,7 @@ function setState(interface, state) {
         button.style.background = "red"
         button.onclick = () => setState(interface, "down")
         interfaceElement.dataset.state = "up"
+        sendAlert("Port felkapcsolva", "success")
     } else {
         send_command(`configure terminal\ninterface ${interface}\nshutdown`)
         console.log(`${interface}: Changed state to down`)
@@ -228,9 +227,11 @@ function setState(interface, state) {
         button.style.background = "green"
         button.onclick = () => setState(interface, "up")
         interfaceElement.dataset.state = "down"
+        sendAlert("Port lekapcsolva", "error")
     }
 }
 
+// Interfész beállítások alkalmazása
 function saveInterfaceChanges(interface) {
     let int = document.getElementById("interface-" + interface)
 
@@ -346,8 +347,11 @@ function saveInterfaceChanges(interface) {
             int.dataset.psviolation = psViolation
         }
     }
+
+    sendAlert("Beállítások sikeresen alkalmazva lettek!", "success")
 }
 
+// Legördülő menük változtatásánál hívott funkciók
 function toggleVlanInput() {
     const modeSelect = document.getElementById('switchport-mode'); // A switchport mód kiválasztása
     const vlanSetting = document.getElementById('vlan-setting'); // VLAN beállítási elem
