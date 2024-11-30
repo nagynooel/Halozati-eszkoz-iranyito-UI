@@ -154,7 +154,7 @@ def send(command):
     
     disable_paging(shell)
     
-    shell.send("en\n")
+    shell.send("enable\n")
     shell.send("cisco\n")
     
     shell.send(command + "\n")

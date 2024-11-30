@@ -2,7 +2,7 @@
 function showGeneralSettings() {
     const settings = `
         <div class="setting"><strong>Hostname:</strong> 
-            <input type="text" id="hostname-input" placeholder="Új hostname megadása" />
+            <input type="text" id="hostname-input" placeholder="Új hostname megadása" value="${generalSettings.dataset.hostname}" />
         </div>
         <button style="position: fixed; right: 1rem; bottom: 1rem;" onclick="changeHostname()">Hostname megváltoztatása</button>
     `;
@@ -20,9 +20,9 @@ function showSettings(interface) {
         </div>
         <div class="setting"><strong>Switchport Mód:</strong>
             <select id="switchport-mode" onchange="toggleVlanInput()">
-                <option value="swdynamic" ${(clickedElement.dataset.swmode == "dynamic") ? "selected" : ""}>Dinamikus</option>
-                <option value="swaccess" ${(clickedElement.dataset.swmode == "access") ? "selected" : ""}>Access</option>
-                <option value="swtrunk" ${(clickedElement.dataset.swmode == "trunk") ? "selected" : ""}>Trunk</option>
+                <option value="dynamic" ${(clickedElement.dataset.swmode == "dynamic") ? "selected" : ""}>Dinamikus</option>
+                <option value="access" ${(clickedElement.dataset.swmode == "access") ? "selected" : ""}>Access</option>
+                <option value="trunk" ${(clickedElement.dataset.swmode == "trunk") ? "selected" : ""}>Trunk</option>
             </select>
         </div>
         <div class="setting" id="vlan-setting">
@@ -34,9 +34,9 @@ function showSettings(interface) {
         <div class="setting"><strong>Portbiztonság</strong> <input type="checkbox" name="port-security-check" id="port-security-check" onclick="togglePortSecurity()" ${(clickedElement.dataset.ps == "On") ? "checked" : ""}/>
             <div class="setting" id="mac-security-type"><strong>Típus:</strong>
                 <select id="port-security-type" onchange="toggleMACInput()">
-                    <option value="psnone" ${(clickedElement.dataset.pstype == "") ? "selected" : ""}>Nincs</option>
-                    <option value="psstatic" ${(clickedElement.dataset.pstype == "static") ? "selected" : ""}>Statikus</option>
-                    <option value="pssticky" ${(clickedElement.dataset.pstype == "sticky") ? "selected" : ""}>Sticky</option>
+                    <option value="none" ${(clickedElement.dataset.pstype == "") ? "selected" : ""}>Nincs</option>
+                    <option value="static" ${(clickedElement.dataset.pstype == "static") ? "selected" : ""}>Statikus</option>
+                    <option value="sticky" ${(clickedElement.dataset.pstype == "sticky") ? "selected" : ""}>Sticky</option>
                 </select>
                 <div class="setting" id="set-mac-address">
                     <strong>MAC-cím:</strong> <input type="text" id="mac-address" placeholder="00:00:00:00:00:00" value="${clickedElement.dataset.psstaticmac}"/>
@@ -47,9 +47,9 @@ function showSettings(interface) {
             </div>
             <div class="setting" id="violation"><strong>Szabálysértés esetén:</strong>
                 <select id="port-security-violation">
-                    <option value="vshutdown" ${(clickedElement.dataset.psviolation == "") ? "selected" : ""}>Lekapcsolás</option>
-                    <option value="vprotect" ${(clickedElement.dataset.psviolation == "protect") ? "selected" : ""}>Védelem</option>
-                    <option value="vrestrict" ${(clickedElement.dataset.psviolation == "restrict") ? "selected" : ""}>Korlátozás</option>
+                    <option value="shutdown" ${(clickedElement.dataset.psviolation == "") ? "selected" : ""}>Lekapcsolás</option>
+                    <option value="protect" ${(clickedElement.dataset.psviolation == "protect") ? "selected" : ""}>Védelem</option>
+                    <option value="restrict" ${(clickedElement.dataset.psviolation == "restrict") ? "selected" : ""}>Korlátozás</option>
                 </select>
             </div>
         </div>
@@ -68,7 +68,7 @@ function showSettings(interface) {
 
 function changeHostname() {
     const newHostName = document.getElementById("hostname-input").value
-    send_command("en\nconf t\nhost " + newHostName)
+    send_command("configure terminal\nhostname " + newHostName)
     console.log("General: Hostname set to " + newHostName)
     document.getElementById("connected-hostname").innerHTML = newHostName
 }
@@ -80,14 +80,14 @@ function setState(interface, state) {
     let interfaceElement = document.getElementById(`interface-${interface}`)
 
     if(state == "up"){
-        send_command(`enable\nconfigure terminal\ninterface ${interface}\nno shutdown`)
+        send_command(`configure terminal\ninterface ${interface}\nno shutdown`)
         console.log(`${interface}: Changed state to up`)
         button.innerHTML = "Lekapcsolás"
         button.style.background = "red"
         button.onclick = () => setState(interface, "down")
         interfaceElement.dataset.state = "up"
     } else {
-        send_command(`enable\nconfigure terminal\ninterface ${interface}\nshutdown`)
+        send_command(`configure terminal\ninterface ${interface}\nshutdown`)
         console.log(`${interface}: Changed state to down`)
         button.innerHTML = "Felkapcsolás"
         button.style.background = "green"
@@ -97,23 +97,75 @@ function setState(interface, state) {
 }
 
 function saveInterfaceChanges(interface) {
-    const ipInput = document.getElementById("ip-address-input")
-    const netmaskInput = document.getElementById("netmask-input")
+    let int = document.getElementById("interface-" + interface)
+
+    const swMode = document.getElementById("switchport-mode").value
+    const swAccessVlan = document.getElementById("vlan-input").value
+    const swTrunkVlan = document.getElementById("allowed-vlan-input").value
+    const ps = document.getElementById("port-security-check").checked
+    const psType = document.getElementById("port-security-type").value
+    const psStaticMac = document.getElementById("mac-address").value
+    const psMaxUser = document.getElementById("maxusers").value
+    const psViolation = document.getElementById("port-security-violation").value
+
+    // Switchport beállítások
+    if (swMode != int.dataset.swmode) {
+        send_command(`configure terminal\ninterface ${interface}\nswitchport mode ${swMode} ${(swMode == "dynamic") ? "desirable" : ""}`)
+        int.dataset.swmode = swMode
+
+        if (swMode == "dynamic") {
+            int.dataset.swtrunkvlan = ""
+            int.dataset.swaccessvlan = ""
+            send_command(`configure terminal\ninterface ${interface}\nno switchport trunk allowed vlan`)
+            send_command(`configure terminal\ninterface ${interface}\nno switchport access vlan`)
+        }
+    }
+
+    if (swMode == "access") {
+        int.dataset.swtrunkvlan = ""
+        send_command(`configure terminal\ninterface ${interface}\nno switchport trunk allowed vlan`)
+        
+        if (swAccessVlan != int.dataset.swaccessvlan) {
+            send_command(`configure terminal\ninterface ${interface}\nswitchport access vlan ${swAccessVlan}`)
+            int.dataset.swaccessvlan = swAccessVlan
+        }
+    } else if (swMode == "trunk") {
+        int.dataset.swaccessvlan = ""
+        send_command(`configure terminal\ninterface ${interface}\nno switchport access vlan`)
+
+        if (swTrunkVlan != int.dataset.swtrunkvlan) {
+            send_command(`configure terminal\ninterface ${interface}\nswitchport trunk allowed vlan ${swTrunkVlan}`)
+            int.dataset.swtrunkvlan = swTrunkVlan
+        }
+    }
+    
 }
 
 function toggleVlanInput() {
     const modeSelect = document.getElementById('switchport-mode'); // A switchport mód kiválasztása
     const vlanSetting = document.getElementById('vlan-setting'); // VLAN beállítási elem
     const allowedVlanSetting = document.getElementById('allowed-vlan-setting'); // VLAN beállítási elem
-    if (modeSelect.value === 'swaccess') { // Ha a mód 'swaccess'
+    const checkbox = document.getElementById("port-security-check")
+    
+    if (modeSelect.value === 'access') { // Ha a mód 'swaccess'
         vlanSetting.style.display = 'block'; // Mutasd a VLAN beállítást
         allowedVlanSetting.style.display = 'none'; // Mutasd a VLAN beállítást
-    } else if(modeSelect.value === 'swtrunk') {
+        checkbox.disabled = false
+        checkbox.title = ""
+    } else if(modeSelect.value === 'trunk') {
         vlanSetting.style.display = 'none'; // Egyébként rejtsd el
         allowedVlanSetting.style.display = 'block'; // Mutasd a VLAN beállítást
+        checkbox.disabled = false
+        checkbox.title = ""
     } else {
         vlanSetting.style.display = 'none';
         allowedVlanSetting.style.display = 'none';
+        // Port security nem állítható be dinamikus porton
+        checkbox.checked = false
+        var clickEvent = new Event("click")
+        checkbox.dispatchEvent(clickEvent)
+        checkbox.disabled = true
+        checkbox.title = "Dinamikus módban a portbiztonság nem engedélyezett"
     }
 }
 
@@ -139,11 +191,11 @@ function toggleMACInput() {
     const macInput = document.getElementById('set-mac-address'); // MAC cím beállítási elem
     const maxUserSettings = document.getElementById('max-users-settings'); // MAC cím beállítási elem
     const violationSettings = document.getElementById('violation'); // MAC cím beállítási elem
-    if (modeSelect.value === 'psnone') {
+    if (modeSelect.value === 'none') {
         macInput.style.display = 'none';
         maxUserSettings.style.display = 'none';
         violationSettings.style.display = 'none';
-    } else if (modeSelect.value === 'pssticky') { // Ha a típus 'sticky'
+    } else if (modeSelect.value === 'sticky') { // Ha a típus 'sticky'
         macInput.style.display = 'none';
         maxUserSettings.style.display = 'block';
         violationSettings.style.display = 'block';

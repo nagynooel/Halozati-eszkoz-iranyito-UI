@@ -1,47 +1,49 @@
-// Beviteli mezők
-const ipInput = document.getElementById('ip-input');
-const portInput = document.getElementById('port-input');
-const usernameInput = document.getElementById('username-input');
-const passwordInput = document.getElementById('password-input');
 // Gombok
-const connectButton = document.getElementById('connect-button');
-const generalSettingsButtons = document.getElementById('general-settings');
-const interfaceItems = document.getElementById('interface-items');
-const interfaceSettings = document.getElementById('interface-settings');
+const connectButton = document.getElementById('connect-button')
+const generalSettingsButtons = document.getElementById('general-settings')
+const interfaceItems = document.getElementById('interface-items')
+const interfaceSettings = document.getElementById('interface-settings')
+const generalSettings = document.getElementById('general-settings')
+
+// Beviteli mezők
+const ipInput = document.getElementById('ip-input')
+const portInput = document.getElementById('port-input')
+const usernameInput = document.getElementById('username-input')
+const passwordInput = document.getElementById('password-input')
 
 // Kapcsolódási űrlap validálása
 function validateForm() {
     // IP cím formátumának ellenőrzésére szolgáló reguláris kifejezés
-    const ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
     
-    ip = ipInput.value
-    port = portInput.value
-    username = usernameInput.value
-    password = passwordInput.value
+    const ip = ipInput.value
+    const port = portInput.value
+    const username = usernameInput.value
+    const password = passwordInput.value
 
     // IP cím formátumának ellenőrzése
     if (!ipRegex.test(ip)) {
-        sendAlert("Érvénytelen IP cím formátum.", "error");
-        return false;
+        sendAlert("Érvénytelen IP cím formátum.", "error")
+        return false
     }
 
     // Port számának ellenőrzése (0-65535 között)
     if (port < 0 || port > 65535) {
-        sendAlert("A portnak 0 és 65535 között kell lennie.", "error");
-        return false;
+        sendAlert("A portnak 0 és 65535 között kell lennie.", "error")
+        return false
     }
 
     // Felhasználónév és jelszó kötelező mezők ellenőrzése
     if (username.trim() === "" || password.trim() === "") {
-        sendAlert("Felhasználónév és jelszó kötelező.", "error");
-        return false;
+        sendAlert("Felhasználónév és jelszó kötelező.", "error")
+        return false
     }
 
     // Minden ellenőrzés sikeres, készen áll a csatlakozásra
-    connect(ip, port, username, password);
+    connect(ip, port, username, password)
     document.getElementById("connected-ip").innerHTML = ip
-    document.getElementById("connected-ip").innerHTML = port
-    return false;
+    document.getElementById("connected-port").innerHTML = port
+    return false
 }
 
 // Kapcsolódás a kapcsolóhoz
@@ -58,49 +60,49 @@ async function connect(ip, port, username, password) {
                 username: username,
                 password: password
             }),
-        });
-        const json = await response.json();
-        const interfaces = Object.keys(json);
+        })
+        const json = await response.json()
+        const interfaces = Object.keys(json)
 
         console.log(json)
         
-        interfaceItems.innerHTML = '';
-        generalSettingsButtons.style.display = 'block';
+        interfaceItems.innerHTML = ''
 
         interfaces.forEach(interface => {
-            if(interface == "general") {
+            if (interface == "general") {
                 return
             }
-            const li = document.createElement('li');
-            li.textContent = interface;
-            li.className = 'interface-item';
-            li.id = 'interface-' + interface;
-            li.onclick = () => showSettings(interface)
-            li.dataset.state = json[interface].state
-            li.dataset.swmode = json[interface].swmode
-            li.dataset.swaccessvlan = json[interface].swaccessvlan
-            li.dataset.swtrunkvlan = json[interface].swtrunkvlan
-            li.dataset.ps = json[interface].ps
-            li.dataset.pstype = json[interface].pstype
-            li.dataset.psstaticmac = json[interface].psstaticmac
-            li.dataset.psmaxuser = json[interface].psmaxuser
-            li.dataset.psviolation = json[interface].psviolation
-            interfaceItems.appendChild(li);
-        });
+            const div = document.createElement('div')
+            div.textContent = interface
+            div.className = 'interface-item'
+            div.id = 'interface-' + interface
+            div.onclick = () => showSettings(interface)
+            div.dataset.state = json[interface].state
+            div.dataset.swmode = json[interface].swmode
+            div.dataset.swaccessvlan = json[interface].swaccessvlan
+            div.dataset.swtrunkvlan = json[interface].swtrunkvlan
+            div.dataset.ps = json[interface].ps
+            div.dataset.pstype = json[interface].pstype
+            div.dataset.psstaticmac = json[interface].psstaticmac
+            div.dataset.psmaxuser = json[interface].psmaxuser
+            div.dataset.psviolation = json[interface].psviolation
+            interfaceItems.appendChild(div)
+        })
 
         // SSH kapcsolódási űrlap eltüntetése és beállítások megjelenítése
-        document.getElementById('container').classList.remove('hide');
-        document.getElementById('connection-status').classList.remove('hide');
-        document.getElementById('connection-container').classList.add('hide');
+        document.getElementById('container').classList.remove('hide')
+        document.getElementById('connection-status').classList.remove('hide')
+        document.getElementById('connection-container').classList.add('hide')
 
         document.getElementById("connected-hostname").innerHTML = json["general"].hostname
+        generalSettings.dataset.hostname = json["general"].hostname
 
     } catch (error) {
-        console.error('Hiba:', error);
+        console.error('Hiba:', error)
     }
-};
+}
 
-// Parancs elkűldése a kapcsolónak
+// Parancs elküldése a kapcsolónak
 function send_command(command_message) {
     fetch("/send_command/", {
         method: "POST",
@@ -114,7 +116,7 @@ function send_command(command_message) {
         return response.json()
     }).then(response => {
         console.log(response)
-    });
+    })
 }
 
 function close_connection() {
