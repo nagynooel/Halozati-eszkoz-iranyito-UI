@@ -1,5 +1,5 @@
 // sendAlert függvény: figyelmeztető üzenet küldése
-function sendAlert(message, type) {
+function sendAlert(message, type, autoClose=true) {
     const alertContainer = document.getElementById("alert-container");
     const alertBox = document.createElement("div");
     alertBox.className = `alert ${type} show`;
@@ -10,12 +10,14 @@ function sendAlert(message, type) {
     alertContainer.appendChild(alertBox);
 
     // 5 másodperc múlva eltűnik a doboz
-    setTimeout(() => {
-        alertBox.classList.remove("show");
+    if (autoClose == true) {
         setTimeout(() => {
-            alertContainer.removeChild(alertBox);
-        }, 500);
-    }, 5000);
+            alertBox.classList.remove("show");
+            setTimeout(() => {
+                alertContainer.removeChild(alertBox);
+            }, 500);
+        }, 5000);
+    }
 }
 
 // closeAlert függvény: figyelmeztető doboz bezárása

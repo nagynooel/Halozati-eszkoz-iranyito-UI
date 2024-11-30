@@ -20,12 +20,16 @@ def connect(request):
         global port
         global username
         global password
+        global enable_password
         host = post_data["ip"]
         port = post_data["port"]
         username = post_data["username"]
         password = post_data["password"]
+        enable_password = post_data["enable_password"]
 
         output = send("show ip interface brief")
+        if not output:
+            return JsonResponse('{Error: "Kapcsolódási hiba"}', safe=False)
 
         interfaces = {}
 
@@ -53,6 +57,9 @@ def connect(request):
         
 
         output = send("show int switchport")
+        if not output:
+            return JsonResponse('{Error: "Kapcsolódási hiba"}', safe=False)
+        
         current_name = ""
         for message in output.splitlines():
             if "Name:" in message:
@@ -80,6 +87,9 @@ def connect(request):
         cviolation = ""
         # Settings in the current iteration
         output = send("show running-config")
+        if not output:
+            return JsonResponse('{Error: "Kapcsolódási hiba"}', safe=False)
+        
         for message in output.splitlines():
             if message.strip() == "!":
                 if not (cint == ""):
@@ -113,58 +123,44 @@ def connect(request):
             elif "switchport port-security violation" in message:
                 cviolation = message.replace("switchport port-security violation ", "").strip()
 
-
-        # for interface in interfaces.keys():
-        #     output = send("show port-security interface " + interface)
-        #     for message in output.splitlines():
-        #         if "Port Security:" in message:
-        #             if "Disabled" in message:
-        #                 interfaces[current_name]["swtype"] = "psnone"
-        #             else:
-        #                 out = send("show port-security interface " + interface + " add")
-        #                 for mess in out.splitlines():
-        #                     if "SecureConfigured" in mess:
-        #                         interfaces[current_name]["pstype"] = "psstatic"
-        #                         p = re.compile("^[a-f0-9]{4}\.^[a-f0-9]{4}\.^[a-f0-9]{4}")
-        #                         print("Teszt")
-        #                         print(p.findall(mess))
-        #                     elif "SecureSticky" in mess: 
-        #                         interfaces[current_name]["pstype"] = "pssticky"
-
-
         return JsonResponse(interfaces, safe=False)
-    return JsonResponse('{Error: "Only POST method allowed"}')
+    return JsonResponse('{Error: "Only POST method allowed"}', safe=False)
 
 @csrf_exempt
 def send_command(request):
     if request.method == "POST":
         post_data = json.loads(request.body)
-        return JsonResponse("{Response: {" + send(post_data["command"]) + "}", safe=False)
+        response = send(post_data["command"])
+        if not response:
+            return JsonResponse('{Error: "Nem sikerült elküldeni az SSH üzenetet"}', safe=False)
+        return JsonResponse("{Response: {" + response + "}", safe=False)
     
-    return JsonResponse('{Error: "Only POST method allowed"}')
+    return JsonResponse('{Error: "Only POST method allowed"}', safe=False)
 
 def send(command):
-    client = paramiko.SSHClient()
+    try:
+        client = paramiko.SSHClient()
 
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(hostname=host, port=port, username=username, password=password)
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname=host, port=port, username=username, password=password)
 
-    shell = client.invoke_shell()
-    output = shell.recv(1000)
-    
-    disable_paging(shell)
-    
-    shell.send("enable\n")
-    shell.send("cisco\n")
-    
-    shell.send(command + "\n")
-    time.sleep(2)
-    output = shell.recv(100000).decode()
-    print(output)
-    print(type(output))
+        shell = client.invoke_shell()
+        output = shell.recv(1000)
+        
+        disable_paging(shell)
+        
+        shell.send(f"enable\n{enable_password}\n")
+        
+        shell.send(command + "\n")
+        time.sleep(2)
+        output = shell.recv(100000).decode()
+        print(output)
+        print(type(output))
 
-    client.close()
-    return output
+        client.close()
+        return output
+    except:
+        return False
 
 def disable_paging(shell):
     shell.send("terminal length 0\n")

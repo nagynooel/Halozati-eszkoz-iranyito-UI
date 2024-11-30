@@ -34,7 +34,6 @@ function showSettings(interface) {
         <div class="setting"><strong>Portbiztonság</strong> <input type="checkbox" name="port-security-check" id="port-security-check" onclick="togglePortSecurity()" ${(clickedElement.dataset.ps == "On") ? "checked" : ""}/>
             <div class="setting" id="mac-security-type"><strong>Típus:</strong>
                 <select id="port-security-type" onchange="toggleMACInput()">
-                    <option value="none" ${(clickedElement.dataset.pstype == "") ? "selected" : ""}>Nincs</option>
                     <option value="static" ${(clickedElement.dataset.pstype == "static") ? "selected" : ""}>Statikus</option>
                     <option value="sticky" ${(clickedElement.dataset.pstype == "sticky") ? "selected" : ""}>Sticky</option>
                 </select>
@@ -102,7 +101,7 @@ function saveInterfaceChanges(interface) {
     const swMode = document.getElementById("switchport-mode").value
     const swAccessVlan = document.getElementById("vlan-input").value
     const swTrunkVlan = document.getElementById("allowed-vlan-input").value
-    const ps = document.getElementById("port-security-check").checked
+    const ps = (document.getElementById("port-security-check").checked) ? "On" : "Off"
     const psType = document.getElementById("port-security-type").value
     const psStaticMac = document.getElementById("mac-address").value
     const psMaxUser = document.getElementById("maxusers").value
@@ -110,15 +109,25 @@ function saveInterfaceChanges(interface) {
 
     // Switchport beállítások
     if (swMode != int.dataset.swmode) {
-        send_command(`configure terminal\ninterface ${interface}\nswitchport mode ${swMode} ${(swMode == "dynamic") ? "desirable" : ""}`)
-        int.dataset.swmode = swMode
-
         if (swMode == "dynamic") {
             int.dataset.swtrunkvlan = ""
             int.dataset.swaccessvlan = ""
-            send_command(`configure terminal\ninterface ${interface}\nno switchport trunk allowed vlan`)
-            send_command(`configure terminal\ninterface ${interface}\nno switchport access vlan`)
+            send_command(
+                `
+                configure terminal
+                interface ${interface}
+                no switchport trunk allowed vlan
+                no switchport access vlan
+                no switchport port-security
+                no switchport port-security mac-address
+                no switchport port-security violation
+                `
+            )
         }
+        
+        send_command(`configure terminal\ninterface ${interface}\nswitchport mode ${swMode} ${(swMode == "dynamic") ? "desirable" : ""}`)
+        int.dataset.swmode = swMode
+        console.log(`${interface}: Changed switchport mode to ${swMode}`)
     }
 
     if (swMode == "access") {
@@ -128,6 +137,7 @@ function saveInterfaceChanges(interface) {
         if (swAccessVlan != int.dataset.swaccessvlan) {
             send_command(`configure terminal\ninterface ${interface}\nswitchport access vlan ${swAccessVlan}`)
             int.dataset.swaccessvlan = swAccessVlan
+            console.log(`${interface}: Changed access vlan to ${swAccessVlan}`)
         }
     } else if (swMode == "trunk") {
         int.dataset.swaccessvlan = ""
@@ -136,9 +146,70 @@ function saveInterfaceChanges(interface) {
         if (swTrunkVlan != int.dataset.swtrunkvlan) {
             send_command(`configure terminal\ninterface ${interface}\nswitchport trunk allowed vlan ${swTrunkVlan}`)
             int.dataset.swtrunkvlan = swTrunkVlan
+            console.log(`${interface}: Changed allowed vlans to ${swTrunkVlan}`)
         }
     }
+
+    // Portsecurity beállítások
+    if (ps != int.dataset.ps) {
+        if (ps == "On") {
+            send_command(`configure terminal\ninterface ${interface}\nswitchport port-security`)
+            console.log(`${interface}: Changed port security to On`)
+        } else {
+            send_command(
+                `
+                configure terminal
+                interface ${interface}
+                no switchport port-security
+                no switchport port-security mac-address
+                no switchport port-security violation
+                `
+            )
+            console.log(`${interface}: Changed port security to Off`)
+        }
+        
+        int.dataset.ps = ps
+    }
     
+    if (ps == "On") {
+        if (psType != int.dataset.pstype) {
+            if (psType == "static") {
+                send_command(
+                    `
+                    configure terminal
+                    interface ${interface}
+                    no switchport port-security mac-address
+                    no switchport port-security mac-address sticky
+                    switchport port-security mac-address ${psStaticMac}
+                    `
+                )
+                int.dataset.psstaticmac = psStaticMac
+                console.log(`${interface}: Changed portsecurity static mac-address to ${psStaticMac}`)
+            } else {
+                send_command(`configure terminal\ninterface ${interface}\nswitchport port-security mac-address sticky`)
+                console.log(`${interface}: Changed portsecurity mac-address to sticky`)
+            }
+            
+            int.dataset.pstype = psType
+        }
+        
+        if (psMaxUser != int.dataset.psmaxuser) {
+            if (psMaxUser == "") {
+                send_command(`configure terminal\ninterface ${interface}\nno switchport port-security maximum`)
+                console.log(`${interface}: Turned maximum mac address option OFF`)
+            } else {
+                send_command(`configure terminal\ninterface ${interface}\nswitchport port-security maximum ${psMaxUser}`)
+                console.log(`${interface}: Changed maximum mac-address to ${psMaxUser}`)
+            }
+            int.dataset.psmaxuser = psMaxUser
+        }
+        
+        if (psViolation != int.dataset.psviolation) {
+            send_command(`configure terminal\ninterface ${interface}\nswitchport port-security violation ${psViolation}`)
+            console.log(`${interface}: Changed port security violation to ${psViolation}`)
+            int.dataset.psviolation = psViolation
+        }
+    }
 }
 
 function toggleVlanInput() {
@@ -191,17 +262,12 @@ function toggleMACInput() {
     const macInput = document.getElementById('set-mac-address'); // MAC cím beállítási elem
     const maxUserSettings = document.getElementById('max-users-settings'); // MAC cím beállítási elem
     const violationSettings = document.getElementById('violation'); // MAC cím beállítási elem
-    if (modeSelect.value === 'none') {
+
+    if (modeSelect.value === 'sticky') { // Ha a típus 'sticky'
         macInput.style.display = 'none';
-        maxUserSettings.style.display = 'none';
-        violationSettings.style.display = 'none';
-    } else if (modeSelect.value === 'sticky') { // Ha a típus 'sticky'
-        macInput.style.display = 'none';
-        maxUserSettings.style.display = 'block';
         violationSettings.style.display = 'block';
     } else {
         macInput.style.display = 'block';
-        maxUserSettings.style.display = 'block';
         violationSettings.style.display = 'block';
     }
 }

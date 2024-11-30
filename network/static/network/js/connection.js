@@ -10,6 +10,7 @@ const ipInput = document.getElementById('ip-input')
 const portInput = document.getElementById('port-input')
 const usernameInput = document.getElementById('username-input')
 const passwordInput = document.getElementById('password-input')
+const enablePasswordInput = document.getElementById('enable-password-input')
 
 // Kapcsolódási űrlap validálása
 function validateForm() {
@@ -40,14 +41,12 @@ function validateForm() {
     }
 
     // Minden ellenőrzés sikeres, készen áll a csatlakozásra
-    connect(ip, port, username, password)
-    document.getElementById("connected-ip").innerHTML = ip
-    document.getElementById("connected-port").innerHTML = port
+    connect(ip, port, username, password, enablePasswordInput.value)
     return false
 }
 
 // Kapcsolódás a kapcsolóhoz
-async function connect(ip, port, username, password) {
+async function connect(ip, port, username, password, enablePassword) {
     try {
         const response = await fetch("/connect/", {
             method: "POST",
@@ -58,7 +57,8 @@ async function connect(ip, port, username, password) {
                 ip: ip,
                 port: port,
                 username: username,
-                password: password
+                password: password,
+                enable_password: enablePassword
             }),
         })
         const json = await response.json()
@@ -96,7 +96,8 @@ async function connect(ip, port, username, password) {
 
         document.getElementById("connected-hostname").innerHTML = json["general"].hostname
         generalSettings.dataset.hostname = json["general"].hostname
-
+        document.getElementById("connected-ip").innerHTML = ip
+        document.getElementById("connected-port").innerHTML = port
     } catch (error) {
         console.error('Hiba:', error)
     }
@@ -114,8 +115,6 @@ function send_command(command_message) {
         }),
     }).then((response) => {
         return response.json()
-    }).then(response => {
-        console.log(response)
     })
 }
 
