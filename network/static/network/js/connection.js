@@ -72,6 +72,16 @@ async function connect(ip, port, username, password, enablePassword, timer) {
             }),
         })
         const json = await response.json()
+
+        if (json["error"].message) {
+            sendAlert(json["error"].message, "error")
+            console.error(`Error: ${json["error"].message}`)
+            clearInterval(timer)
+            connectButton.disabled = false
+            connectButton.innerHTML = "Kapcsolódás"
+            return false
+        }
+
         const interfaces = Object.keys(json)
 
         console.log(json)

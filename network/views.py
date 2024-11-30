@@ -29,7 +29,10 @@ def connect(request):
 
         output = send("show ip interface brief")
         if not output:
-            return JsonResponse('{Error: "Kapcsolódási hiba"}', safe=False)
+            error = {}
+            error["error"] = {}
+            error["error"]["message"] = "Kapcsolódási hiba"
+            return JsonResponse(error, safe=False)
 
         interfaces = {}
 
@@ -58,7 +61,10 @@ def connect(request):
 
         output = send("show int switchport")
         if not output:
-            return JsonResponse('{Error: "Kapcsolódási hiba"}', safe=False)
+            error = {}
+            error["error"] = {}
+            error["error"]["message"] = "Kapcsolódási hiba"
+            return JsonResponse(error, safe=False)
         
         current_name = ""
         for message in output.splitlines():
@@ -93,7 +99,10 @@ def connect(request):
         # Settings in the current iteration
         output = send("show running-config")
         if not output:
-            return JsonResponse('{Error: "Kapcsolódási hiba"}', safe=False)
+            error = {}
+            error["error"] = {}
+            error["error"]["message"] = "Kapcsolódási hiba"
+            return JsonResponse(error, safe=False)
         
         for message in output.splitlines():
             if message.strip() == "!":
@@ -150,7 +159,11 @@ def connect(request):
         interfaces["general"]["defaultgateway"] = default_gateway
 
         return JsonResponse(interfaces, safe=False)
-    return JsonResponse('{Error: "Only POST method allowed"}', safe=False)
+    
+    error = {}
+    error["error"] = {}
+    error["error"]["message"] = "Kapcsolódási hiba"
+    return JsonResponse(error, safe=False)
 
 @csrf_exempt
 def send_command(request):
@@ -158,10 +171,16 @@ def send_command(request):
         post_data = json.loads(request.body)
         response = send(post_data["command"])
         if not response:
-            return JsonResponse('{Error: "Nem sikerült elküldeni az SSH üzenetet"}', safe=False)
-        return JsonResponse("{Response: {" + response + "}", safe=False)
+            error = {}
+            error["error"] = {}
+            error["error"]["message"] = "Nem sikerült elküldeni az SSH üzenetet"
+            return JsonResponse(error, safe=False)
+        return JsonResponse('{"response": {"message": "' + response + '"}', safe=False)
     
-    return JsonResponse('{Error: "Only POST method allowed"}', safe=False)
+    error = {}
+    error["error"] = {}
+    error["error"]["message"] = "Only POST method allowed"
+    return JsonResponse(error, safe=False)
 
 def send(command):
     try:
