@@ -40,12 +40,23 @@ function validateForm() {
     }
 
     // Minden ellenőrzés sikeres, készen áll a csatlakozásra
-    connect(ip, port, username, password, enablePasswordInput.value)
+    seconds = 0
+
+    function timer() {
+        seconds += 1
+        connectButton.innerHTML = `Kapcsolódás folyamatban... ${seconds}mp`
+    }
+
+    var interval = setInterval(timer, 1000)
+    connectButton.disabled = true
+    connectButton.innerHTML = "Kapcsolódás folyamatban..."
+
+    connect(ip, port, username, password, enablePasswordInput.value, interval)
     return false
 }
 
 // Kapcsolódás a kapcsolóhoz
-async function connect(ip, port, username, password, enablePassword) {
+async function connect(ip, port, username, password, enablePassword, timer) {
     try {
         const response = await fetch("/connect/", {
             method: "POST",
@@ -101,6 +112,9 @@ async function connect(ip, port, username, password, enablePassword) {
 
         document.getElementById("connected-ip").innerHTML = ip
         document.getElementById("connected-port").innerHTML = port
+
+        sendAlert("Sikeres kapcsolódás", "success")
+        clearInterval(timer)
     } catch (error) {
         console.error('Hiba:', error)
     }
@@ -122,6 +136,7 @@ function send_command(command_message) {
 }
 
 function close_connection() {
-    fetch("/close/")
-    console.log("Connection closed")
+    if (confirm("A nem alkalmazott beállítások elvesznek. Biztos szét akar kapcsolni?") == true) {
+        location.reload()
+    }
 }

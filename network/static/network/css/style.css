@@ -77,6 +77,14 @@ button:hover {
     transform: scale(1.05);
 }
 
+button:disabled {
+    background-color: grey;
+    color: white;
+}
+
+button:disabled:hover {
+    transform: none;
+}
 /* Fő tartalom */
 #container {
     display: flex;
