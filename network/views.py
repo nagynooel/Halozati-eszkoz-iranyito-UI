@@ -85,6 +85,11 @@ def connect(request):
         cmac = ""
         cmaxuser = ""
         cviolation = ""
+
+        management_active = False
+        management_ip = ""
+        management_mask = ""
+        default_gateway = ""
         # Settings in the current iteration
         output = send("show running-config")
         if not output:
@@ -105,9 +110,26 @@ def connect(request):
                     cmac = ""
                     cmaxuser = ""
                     cviolation = ""
+                    management_active = False
+                
                 continue
+
+            # Management ip cím és alhálózati maszk
+            if management_active:
+                if "ip address" in message:
+                    message = message.replace("ip address", "").strip()
+                    management_ip= message.split()[0]
+                    management_mask = message.split()[1]
+                    management_active = False
+                continue
+
+            # Általános beállítások
             if "hostname" in message:
                 interfaces["general"]["hostname"] = message.replace("hostname ", "").strip()
+            elif "interface Vlan1" in message:
+                management_active = True
+            elif "ip default-gateway" in message:
+                default_gateway = message.replace("ip default-gateway ", "").strip()
             elif "interface" in message and "Vlan" not in message:
                 cint = message.replace("interface ", "").strip()
             elif "switchport port-security" == message.strip():
@@ -122,6 +144,10 @@ def connect(request):
                 cmaxuser = message.replace("switchport port-security maximum ", "").strip()
             elif "switchport port-security violation" in message:
                 cviolation = message.replace("switchport port-security violation ", "").strip()
+        
+        interfaces["general"]["managementip"] = management_ip
+        interfaces["general"]["subnetmask"] = management_mask
+        interfaces["general"]["defaultgateway"] = default_gateway
 
         return JsonResponse(interfaces, safe=False)
     return JsonResponse('{Error: "Only POST method allowed"}', safe=False)

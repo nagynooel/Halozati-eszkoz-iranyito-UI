@@ -1,6 +1,5 @@
 // Gombok
 const connectButton = document.getElementById('connect-button')
-const generalSettingsButtons = document.getElementById('general-settings')
 const interfaceItems = document.getElementById('interface-items')
 const interfaceSettings = document.getElementById('interface-settings')
 const generalSettings = document.getElementById('general-settings')
@@ -96,6 +95,10 @@ async function connect(ip, port, username, password, enablePassword) {
 
         document.getElementById("connected-hostname").innerHTML = json["general"].hostname
         generalSettings.dataset.hostname = json["general"].hostname
+        generalSettings.dataset.managementip = json["general"].managementip
+        generalSettings.dataset.subnetmask = json["general"].subnetmask
+        generalSettings.dataset.defaultgateway = json["general"].defaultgateway
+
         document.getElementById("connected-ip").innerHTML = ip
         document.getElementById("connected-port").innerHTML = port
     } catch (error) {

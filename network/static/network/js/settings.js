@@ -4,11 +4,22 @@ function showGeneralSettings() {
         <div class="setting"><strong>Hostname:</strong> 
             <input type="text" id="hostname-input" placeholder="Új hostname megadása" value="${generalSettings.dataset.hostname}" />
         </div>
-        <button style="position: fixed; right: 1rem; bottom: 1rem;" onclick="changeHostname()">Hostname megváltoztatása</button>
+        <div class="setting"><strong>Új Enable Jelszó:</strong> 
+            <input type="password" id="new-enable-password-input" placeholder="Új enable jelszó megadása" />
+        </div>
+        <div class="setting"><strong>Management VLAN IP:</strong> 
+            <input type="text" id="management-ip-input" placeholder="IP cím" value="${generalSettings.dataset.managementip}" />
+            <strong>Alhálózati Maszk:</strong> 
+            <input type="text" id="subnet-mask-input" placeholder="Alhálózati Maszk" value="${generalSettings.dataset.subnetmask}" />
+        </div>
+        <div class="setting"><strong>Alapértelmezett Átjáró:</strong> 
+            <input type="text" id="default-gateway-input" placeholder="Alapértelmezett átjáró" value="${generalSettings.dataset.defaultgateway}" />
+        </div>
+        <button style="position: fixed; right: 1rem; bottom: 1rem;" onclick="saveGeneralSettings()">Módosítások Alkalmazása</button>
+        <button style="position: fixed; right: 1rem; bottom: 4rem;" onclick="saveRunningConfig()">Running Config mentése</button>
     `;
     interfaceSettings.innerHTML = settings; // Beállítások hozzáadása az interfészhez
 }
-
 // Kapcsoló interfész beállításainak megjelenítése
 function showSettings(interface) {
     let clickedElement = document.getElementById("interface-" + interface)
@@ -70,6 +81,131 @@ function changeHostname() {
     send_command("configure terminal\nhostname " + newHostName)
     console.log("General: Hostname set to " + newHostName)
     document.getElementById("connected-hostname").innerHTML = newHostName
+}
+
+function saveGeneralSettings() {
+    const generalSettings = document.getElementById('general-settings')
+
+    const newHostName = document.getElementById("hostname-input").value
+    const enablePassword = document.getElementById("new-enable-password-input").value
+    const managementIp = document.getElementById("management-ip-input").value
+    const subnetMask = document.getElementById("subnet-mask-input").value
+    const defaultGateway = document.getElementById("default-gateway-input").value
+
+    // Hostname
+    if (newHostName != generalSettings.dataset.hostname) {
+        send_command(`configure terminal\nhostname ${newHostName}`)
+        document.getElementById("connected-hostname").innerHTML = newHostName
+        
+        generalSettings.dataset.hostname = newHostName
+        console.log("General: Hostname set to " + newHostName)
+    }
+    
+    // Alapértelmezett átjáró
+    if (defaultGateway != generalSettings.dataset.defaultgateway) {
+        if (defaultGateway == "") {
+            send_command(
+                `
+                configure terminal
+                no ip default-gateway
+                `
+            )
+            console.log(`General: Default gateway removed`)
+        } else {
+            send_command(
+                `
+                configure terminal
+                ip default-gateway ${defaultGateway}
+                `
+            )
+            console.log(`General: Default gateway changed to ${defaultGateway}`)
+        }
+        
+        generalSettings.dataset.defaultgateway = defaultGateway
+    }
+
+    // Ha enable jelszó és management vlan is változik
+    // Management vlan ip és maszk
+    if (enablePassword != "" && (managementIp != generalSettings.dataset.managementip || subnetMask != generalSettings.dataset.subnetmask)) {
+        if (confirm("A management VLAN és enable jelszó beállítása után újra kell csatlakozni az eszközhöz. Szeretné folytatni?") == true){
+            if (managementIp == "" || subnetMask == "") {
+                send_command(
+                    `
+                    configure terminal
+                    no enable password
+                    no enable secret
+                    enable password ${enablePassword}
+                    int vlan1
+                    no shutdown
+                    no ip address
+                    `
+                )
+                console.log("General: Management VLAN 1 ip address removed")
+            } else {
+                send_command(
+                    `
+                    configure terminal
+                    no enable password
+                    no enable secret
+                    enable password ${enablePassword}
+                    int vlan1
+                    no shutdown
+                    ip address ${managementIp} ${subnetMask}
+                    `
+                )
+                console.log(`General: Management VLAN 1 ip address changed to ${managementIp} ${subnetMask}`)
+            }
+
+            location.reload()
+        }
+    }else if (enablePassword != "") {
+        if (confirm("Az enable jelszó megváltoztatása után újra kell csatlakozni az eszközhöz. Szeretné folytatni?") == true){
+            send_command(
+                `
+                configure terminal
+                no enable password
+                no enable secret
+                enable password ${enablePassword}
+                `
+            )
+            console.log("General: Changed enable password")
+            location.reload()
+        }
+    } else if (managementIp != generalSettings.dataset.managementip || subnetMask != generalSettings.dataset.subnetmask) {
+        if (confirm("A management VLAN beállítása után újra kell csatlakozni az eszközhöz. Szeretné folytatni?") == true){
+            if (managementIp == "" || subnetMask == "") {
+                send_command(
+                    `
+                    configure terminal
+                    int vlan1
+                    no shutdown
+                    no ip address
+                    `
+                )
+                console.log("General: Management VLAN 1 ip address removed")
+            } else {
+                send_command(
+                    `
+                    configure terminal
+                    int vlan1
+                    no shutdown
+                    ip address ${managementIp} ${subnetMask}
+                    `
+                )
+                console.log(`General: Management VLAN 1 ip address changed to ${managementIp} ${subnetMask}`)
+            }
+
+            location.reload()
+        }
+    }
+
+}
+
+function saveRunningConfig() {
+    if (confirm("Biztos benne hogy szeretné elmenteni a startup-configba a változtatásokat?")) {
+        send_command("write")
+        console.log("General: Saved running-config into startup config")
+    }
 }
 
 // Kapcsoló állapotának váltása
