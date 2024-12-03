@@ -11,6 +11,85 @@ const usernameInput = document.getElementById('username-input')
 const passwordInput = document.getElementById('password-input')
 const enablePasswordInput = document.getElementById('enable-password-input')
 
+// Add this function to your existing connection.js file
+function testConnection() {
+    fetch("/test_connection/", {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            sendAlert("Test connection successful!", "success");
+            // Hide the connection form
+            document.getElementById('connection-container').classList.add('hide');
+            // Show mock interfaces
+            showMockInterfaces();
+            // Show connection status
+            showConnectionStatus("0.0.0.0", "22", "Mock Device"); // You can adjust the IP, port, and hostname as needed
+        } else {
+            sendAlert("Test connection failed!", "error");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        sendAlert("An error occurred during the test connection.", "error");
+    });
+}
+
+function showConnectionStatus(ip, port, hostname) {
+    document.getElementById("connected-ip").innerHTML = ip;
+    document.getElementById("connected-port").innerHTML = port;
+    document.getElementById("connected-hostname").innerHTML = hostname;
+    
+    // Show the connection status container
+    document.getElementById('connection-status').classList.remove('hide');
+}
+
+// Function to display mock interfaces
+function showMockInterfaces() {
+    const mockInterfaces = {
+        "GigabitEthernet0/1": { state: "up", swmode: "access", swaccessvlan: "10", swtrunkvlan: "" },
+        "GigabitEthernet0/2": { state: "down", swmode: "trunk", swaccessvlan: "", swtrunkvlan: "100" },
+        "FastEthernet0/1": { state: "up", swmode: "access", swaccessvlan: "20", swtrunkvlan: "" }
+    };
+
+    const interfaceItems = document.getElementById('interface-items');
+    interfaceItems.innerHTML = ''; // Clear existing items
+
+    for (const [interfaceName, settings] of Object.entries(mockInterfaces)) {
+        const div = document.createElement('div');
+        div.textContent = interfaceName;
+        div.className = 'interface-item';
+        div.id = 'interface-' + interfaceName;
+        div.onclick = () => showSettings(interfaceName, settings);
+        div.dataset.state = settings.state;
+        div.dataset.swmode = settings.swmode;
+        div.dataset.swaccessvlan = settings.swaccessvlan;
+        div.dataset.swtrunkvlan = settings.swtrunkvlan;
+        interfaceItems.appendChild(div);
+    }
+
+    // Show the container with interfaces
+    document.getElementById('container').classList.remove('hide');
+}
+
+// Function to show settings for a specific interface
+function showSettings(interfaceName, settings) {
+    // Similar to your existing showSettings function, you can create a new interface settings display
+    const interfaceSettings = document.getElementById('interface-settings');
+    const settingsHtml = `
+        <div class="setting"><strong>Interface:</strong> ${interfaceName}</div>
+        <div class="setting"><strong>State:</strong> ${settings.state}</div>
+        <div class="setting"><strong>Switchport Mode:</strong> ${settings.swmode}</div>
+        <div class="setting"><strong>Access VLAN:</strong> ${settings.swaccessvlan}</div>
+        <div class="setting"><strong>Trunk VLANs:</strong> ${settings.swtrunkvlan}</div>
+    `;
+    interfaceSettings.innerHTML = settingsHtml;
+}
+
 // Kapcsolódási űrlap validálása
 function validateForm() {
     // IP cím formátumának ellenőrzésére szolgáló reguláris kifejezés

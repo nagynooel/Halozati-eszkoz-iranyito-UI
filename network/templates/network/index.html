@@ -28,9 +28,12 @@
         <input type="password" id="password-input" name="password-input" placeholder="Jelszó" required/>
         <input type="password" id="enable-password-input" name="enable-password-input" placeholder="Enable Jelszó"/>
         <button type="submit" id="connect-button">Kapcsolódás</button>
+        <!-- Add this button below the existing connection form -->
+<button type="button" id="test-connection-button" onclick="testConnection()">Test Connection</button>
     </form>
     
     <!-- Kapcsolat állapotának megjelenítése -->
+    <!-- Connection status display -->
     <div id="connection-status" class="connection-status hide">
         <span class="status-dot"></span>
         <span id="connection-message">Kapcsolódva: <span id="connected-ip">0.0.0.0</span>:<span id="connected-port">0</span> (<span id="connected-hostname">Hostname</span>), Típus: <span id="connection-type">SSH</span></span>

@@ -11,6 +11,15 @@ import re
 def index_view(request):
     return render(request, "network/index.html")
 
+# Add this function to your existing views.py file
+@csrf_exempt
+def test_connection(request):
+    if request.method == "POST":
+        # Simulate a successful connection response
+        return JsonResponse({"success": True})
+    
+    return JsonResponse({"success": False}, status=400)
+
 @csrf_exempt
 def connect(request):
     if request.method == "POST":
