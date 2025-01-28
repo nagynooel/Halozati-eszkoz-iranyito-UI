@@ -1,6 +1,6 @@
 # Cisco Switch Management UI
 
-[![hu](https://img.shields.io/badge/lang-hu-green.svg)](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/README.md)
+[![hu](https://img.shields.io/badge/lang-hu-green.svg)](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/README.hu.md)
 
 ## Project Description
 The project is a Django-based web application designed to provide a simple and intuitive interface for **configuring Cisco switches** via the SSH protocol. The project was tested on a C2960 switch with the C2960-K9 operating system.

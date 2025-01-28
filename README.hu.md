@@ -1,6 +1,6 @@
 # Cisco Kapcsoló Irányító UI
 
-[![en](https://img.shields.io/badge/lang-en-green.svg)](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/README.hu.md)
+[![en](https://img.shields.io/badge/lang-en-green.svg)](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/README.md)
 
 ## Projekt leírása
 A projekt egy Django-alapú webalkalmazás, amely célja egy egyszerű és intuitív felület biztosítása **Cisco kapcsolók konfigurálásához** SSH protokollon keresztül. A projekt egy C2960 típusú, C2960-K9 operációs rendszerrel rendelkező kapcsolón lett tesztelve.
