@@ -53,7 +53,7 @@ A webalkalmazás futtatása előtt először telepíteni kell a szükséges csom
 
 A kezdőlapon látható űrlap kitöltésénél adjuk meg a kapcsoló adatait, amelyek az SSH-csatlakozáshoz szükségesek. A jelszó mezők üresen hagyhatók, ha a kapcsolón nem állítottunk be jelszót. A bejelentkezési űrlap az *1. ábrán* látható.
 
-![Bejelentkezési űrlap](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/login-img.png)
+![Bejelentkezési űrlap](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/login-img.PNG)
 
 *1. ábra: Bejelentkezési űrlap*
 
@@ -66,7 +66,7 @@ A bal oldalon található az általános beállítások fül, aminek segítség�
 
 Az általános beállítások grafikus felülete a *2. ábrán* látható.
 
-![Általános beállítások](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/general-settings-img.png)
+![Általános beállítások](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/general-settings-img.PNG)
 
 *2. ábra: Általános beállítások*
 
@@ -78,7 +78,7 @@ A kapcsoló futó konfigurációjának mentése az indító konfigurációba a *
 
 A csatlakozás után az oldal automatikusan lekéri a kapcsolón elérhető interfészeket, és kilistázza a bal oldali menüben. A konfigurálni kívánt interfész kiválasztása után a *3. ábrán* látható beállítási felület jelenik meg.
 
-![Interfész beállítások](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/general-settings-img.png)
+![Interfész beállítások](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/general-settings-img.PNG)
 
 *3. ábra: Interfész beállítások*
 

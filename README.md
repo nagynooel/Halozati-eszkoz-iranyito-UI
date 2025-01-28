@@ -53,7 +53,7 @@ Before running the web application, you need to install the required packages li
 
 On the homepage, fill out the form with the switch details required for SSH connection. Password fields can be left empty if no password is set on the switch. The login form is shown in *Figure 1*.
 
-![Login Form](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/login-img.png)
+![Login Form](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/login-img.PNG)
 
 *Figure 1: Login Form*
 
@@ -66,7 +66,7 @@ On the left-hand side, you will find the general settings tab, which allows you 
 
 The graphical interface for general settings is shown in *Figure 2*.
 
-![General Settings](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/general-settings-img.png)
+![General Settings](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/general-settings-img.PNG)
 
 *Figure 2: General Settings*
 
@@ -78,7 +78,7 @@ Saving the running configuration to the startup configuration can be done by cli
 
 After connecting, the application automatically retrieves the available interfaces on the switch and lists them in the left-hand menu. Once you select an interface to configure, the settings interface shown in *Figure 3* will appear.
 
-![Interface Settings](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/general-settings-img.png)
+![Interface Settings](https://github.com/nagynooel/Halozati-eszkoz-iranyito-UI/blob/master/documentation/general-settings-img.PNG)
 
 *Figure 3: Interface Settings*
 
